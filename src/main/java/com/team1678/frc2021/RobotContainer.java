@@ -1,5 +1,8 @@
 package com.team1678.frc2021;
 
+import com.team1678.frc2021.subsystems.Indexer;
+import com.team1678.frc2021.subsystems.Intake;
+import com.team1678.frc2021.subsystems.Shooter;
 import com.team1678.frc2021.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,7 +19,10 @@ public class RobotContainer {
     private final XboxController driver = new XboxController(0);
 
     private final Swerve swerve = Swerve.getInstance();
-    
+    private final Indexer indexer = Indexer.getInstance();
+    private final Intake intake = Intake.getInstance();
+    private final Shooter shooter = Shooter.getInstance();
+
     private final AutonomousSelector autonomousSelector;
     private AutonomousTrajectories autonomousTrajectories;
 
@@ -44,6 +50,18 @@ public class RobotContainer {
     private void configureButtonBindings() {
         driver.getBackButton().whenPressed(
                 () -> swerve.resetGyroAngle(Rotation2.ZERO)
+        );
+        driver.getRightTriggerAxis().getButton(1.0).whenPressed(
+                () -> intake.setState(Intake.WantedAction.INTAKE)
+        );
+        driver.getRightTriggerAxis().getButton(1.0).whenReleased(
+                () -> intake.setState(Intake.WantedAction.NONE)
+        );
+        driver.getBButton().whenPressed(
+                () -> shooter.setVelocity(2)
+        );
+        driver.getBButton().whenReleased(
+                () -> shooter.setVelocity(0)
         );
         driver.getStartButton().whenPressed(
                 swerve::resetWheelAngles
