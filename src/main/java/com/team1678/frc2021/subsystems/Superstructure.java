@@ -2,8 +2,10 @@ package com.team1678.frc2021.subsystems;
 
 import com.team1678.frc2021.Ports;
 import com.team1678.frc2021.RobotState;
+import com.team1678.frc2021.SuperstructureConstants;
 import com.team1678.frc2021.loops.ILooper;
 import com.team1678.frc2021.loops.Loop;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -12,9 +14,13 @@ import java.util.Arrays;
 
 public class Superstructure extends Subsystem {
 
-    private Swerve swerve;
-    private Compressor compressor;
-    private RobotState robotstate;
+    // Instances
+
+    private static Superstructure mInstance;
+
+    private final Shooter mShooter = Shooter.getInstance();
+    private final Hood mHood = Hood.getInstance();
+    private final Indexer mIndexer = Indexer.getInstance();
 
     private boolean mWantsShoot = false;
     private boolean mWantsSpinUp = false;
@@ -28,26 +34,28 @@ public class Superstructure extends Subsystem {
 
     private double mCurrentHood = 0.0;
 
-    private double mHoodSetpoint = 70.5;
-    private double mShooterSetpoint = 4000.0;
+    private double mHoodSetpoint = 70.5;         // TODO correct
+    private double mShooterSetpoint = 4000.0;    // TODO correct
     private boolean mGotSpunUp = false;
-    private boolean mEnableIndexer = true;
+    private boolean mEnableIndexer = false;
     private boolean mManualZoom = false;
 
     private double mAngleAdd = 0.0;
 
-    public static Superstructure instance = null;
+    private Rotation2d mFieldRelativeTurretGoal = null;
 
-    public Superstructure() {
-        swerve = Swerve.getInstance();
-        robotstate = RobotState.getInstance();
-        compressor = new Compressor(Ports.DRIVEBASE_PCM);
+    private boolean mHasTarget = false;
+    private boolean mOnTarget = false;
+    private int mTrackId = -1;
+
+    private Superstructure() {
+        // The superstructure class
     }
 
     public static synchronized Superstructure getInstance(){
-        if(instance == null)
-            instance = new Superstructure();
-        return instance;
+        if(mInstance == null)
+            mInstance = new Superstructure();
+        return mInstance;
     }
 
     private final Loop loop = new Loop() {
