@@ -80,24 +80,6 @@ public class Superstructure extends Subsystem {
         return mInstance;
     }
 
-    private final Loop loop = new Loop() {
-
-        @Override
-        public void onStart(double timestamp) {
-            stop();
-        }
-
-        @Override
-        public void onLoop(double timestamp) {
-
-        }
-
-        @Override
-        public void onStop(double timestamp) {
-            disabledState();
-        }
-    };
-
     private double rotation2ToDegrees(Rotation2 angle) {
         return angle.toDegrees();
     }
