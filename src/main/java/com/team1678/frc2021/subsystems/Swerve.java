@@ -80,6 +80,7 @@ public class Swerve implements Subsystem, UpdateManager.Updatable {
     );
     
     private final Object sensorLock = new Object();
+
     @GuardedBy("sensorLock")
     private Gyroscope gyroscope = new Pigeon(Ports.PIGEON_TALON);
 
@@ -259,7 +260,7 @@ public class Swerve implements Subsystem, UpdateManager.Updatable {
         }
     }
 
-    public static Rotation2 getGyroAngle() {
+    public  Rotation2 getGyroAngle() {
         synchronized (sensorLock) {
             return gyroscope.getAngle();
         }

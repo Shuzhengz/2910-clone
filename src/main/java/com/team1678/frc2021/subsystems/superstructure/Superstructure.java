@@ -1,11 +1,10 @@
-package com.team1678.frc2021.subsystems;
+package com.team1678.frc2021.subsystems.superstructure;
 
 import com.team1678.frc2021.Constants;
-import com.team1678.frc2021.Ports;
 import com.team1678.frc2021.RobotState;
-import com.team1678.frc2021.SuperstructureConstants;
 import com.team1678.frc2021.loops.ILooper;
 import com.team1678.frc2021.loops.Loop;
+import com.team1678.frc2021.subsystems.*;
 import com.team1678.lib.util.InterpolatingDouble;
 import com.team1678.lib.util.UnitConversion;
 import com.team1678.lib.util.Util;
@@ -13,12 +12,8 @@ import com.team254.lib.geometry.Twist2d;
 import com.team254.lib.vision.AimingParameters;
 import com.team2910.lib.math.RigidTransform2;
 import com.team2910.lib.math.Rotation2;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 
 public class Superstructure extends Subsystem {
@@ -27,40 +22,45 @@ public class Superstructure extends Subsystem {
 
     private static Superstructure mInstance;
 
-    private final Shooter mShooter = Shooter.getInstance();
-    private final Hood mHood = Hood.getInstance();
+    protected final Shooter mShooter = Shooter.getInstance();
+    protected final Hood mHood = Hood.getInstance();
     private final Indexer mIndexer = Indexer.getInstance();
     private final RobotState mRobotState = RobotState.getInstance();
 
-    private boolean mWantsShoot = false;
-    private boolean mWantsSpinUp = false;
-    private boolean mWantsTuck = false;
-    private boolean mWantsFendor = false;
-    private boolean mWantsTestSpit = false;
     private boolean mUseInnerTarget = false;
-    private boolean mWantsPreShot = false;
     private boolean mWantsUnjam = false;
     private boolean mWantsHoodScan = false;
+    private boolean mEnforceAutoAimMinDistance = false;
+    protected boolean mIndexShouldSpin = false;
+    protected boolean mWantsTuck = false;
+    protected boolean mWantsFendor = false;
+    protected boolean mWantsTestSpit = false;
+    protected boolean mWantsSpinUp = false;
+    protected boolean mWantsPreShot = false;
+    protected boolean mWantsShoot = false;
 
     private double mAngleAdd = 0.0;
 
-    private double mAimSetpoint = 0.0;
-    private double mHoodSetpoint = 70.5;         // TODO correct
-    private double mShooterSetpoint = 4000.0;    // TODO correct
+    protected double mAimSetpoint = 0.0;
+    protected double mHoodSetpoint = 70.5;         // TODO correct
+    protected double mShooterSetpoint = 4000.0;    // TODO correct
 
     private double mCurrentAim = 0.0;
     private double mCurrentHood = 0.0;
 
-    private boolean mGotSpunUp = false;
-    private boolean mEnableIndexer = false;
+    protected boolean mGotSpunUp = false;
+    protected boolean mEnableIndexer = false;
     private boolean mManualZoom = false;
     private boolean mDisableLimelight = false;
 
+    /**
+     * Shooting things
+     */
     private double mHoodFeedforwardV = 0.0;
-    private Optional<AimingParameters> mLatestAimingParameters = Optional.empty();
     private double mCorrectedRangeToTarget = 0.0;
-    private boolean mEnforceAutoAimMinDistance = false;
     private double mAutoAimMinDistance = 500;
+    private double mAimingThrottle = 0.0;
+    protected Optional<AimingParameters> mLatestAimingParameters = Optional.empty();
 
     private Rotation2 mFieldRelativeAimingGoal = null;
 
@@ -74,11 +74,11 @@ public class Superstructure extends Subsystem {
 
     private AimingControlModes mAimingMode = AimingControlModes.FIELD_RELATIVE;
 
-    private Superstructure() {
+    protected Superstructure() {
         // The superstructure class
     }
 
-    public static synchronized Superstructure getInstance(){
+    public synchronized Superstructure getInstance(){
         if(mInstance == null)
             mInstance = new Superstructure();
         return mInstance;
@@ -160,7 +160,7 @@ public class Superstructure extends Subsystem {
         mCurrentHood = mHood.getAngle();
     }
 
-    private double getShootingSetpointRpm(double range) {
+    double getShootingSetpointRpm(double range) {
         if (SuperstructureConstants.kUseSmartdashboard) {
             return SmartDashboard.getNumber("Shooting RPM", 0);
         } else if (SuperstructureConstants.kUseFlywheelAutoAimPolynomial) {
@@ -170,7 +170,7 @@ public class Superstructure extends Subsystem {
         }
     }
 
-    private double getHoodSetpointAngle(double range) {
+    double getHoodSetpointAngle(double range) {
         if (SuperstructureConstants.kUseSmartdashboard) {
             return SmartDashboard.getNumber("Hood Angle", 0);
         } else if (SuperstructureConstants.kUseHoodAutoAimPolynomial) {
@@ -213,8 +213,12 @@ public class Superstructure extends Subsystem {
     }
 
     public synchronized void updateCurrentState() {
-        mCurrentAim = rotation2ToDegrees(Swerve.getGyroAngle());
+        mCurrentAim = getGyroDegrees();
         mCurrentHood = mHood.getAngle();
+    }
+
+    private double getGyroDegrees() {
+        return rotation2ToDegrees(Swerve.getGyroAngle());
     }
 
     public synchronized double getCorrectedRangeToTarget() {
@@ -358,6 +362,14 @@ public class Superstructure extends Subsystem {
         // System.out.println("turret error " + turret_error.toDegrees());
         safetyReset();
     }
+
+    // Aim like a God
+    public synchronized void setAimOpenLoop(double throttle) {
+        mAimingMode = AimingControlModes.OPEN_LOOP;
+        mAimingThrottle = throttle;
+    }
+
+
 
     @Override
     public void outputTelemetry() {
