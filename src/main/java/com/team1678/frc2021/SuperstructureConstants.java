@@ -10,8 +10,7 @@ public class SuperstructureConstants extends Constants {
     public static final double kShooterPaddingVelocity = 100;
 
 
-    public static final double[] kPadding = {
-            kTurretPaddingDegrees, kShooterPaddingVelocity, kHoodPaddingDegrees};
+    public static final double[] kPadding = { kShooterPaddingVelocity, kHoodPaddingDegrees };
 
     //turret
     public static final double kTurretDOF = 360;
