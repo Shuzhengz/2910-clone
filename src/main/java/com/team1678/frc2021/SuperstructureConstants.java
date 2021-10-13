@@ -5,15 +5,11 @@ import com.team1678.lib.util.InterpolatingTreeMap;
 import com.team1678.lib.util.PolynomialRegression;
 
 public class SuperstructureConstants extends Constants {
-    public static final double kTurretPaddingDegrees = 3;
     public static final double kHoodPaddingDegrees = 2;
     public static final double kShooterPaddingVelocity = 100;
 
 
     public static final double[] kPadding = { kShooterPaddingVelocity, kHoodPaddingDegrees };
-
-    //turret
-    public static final double kTurretDOF = 360;
 
 
     //hood

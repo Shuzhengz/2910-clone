@@ -7,8 +7,11 @@ import com.team1678.frc2021.SuperstructureConstants;
 import com.team1678.frc2021.loops.ILooper;
 import com.team1678.frc2021.loops.Loop;
 import com.team1678.lib.util.InterpolatingDouble;
+import com.team1678.lib.util.UnitConversion;
 import com.team1678.lib.util.Util;
+import com.team254.lib.geometry.Twist2d;
 import com.team254.lib.vision.AimingParameters;
+import com.team2910.lib.math.RigidTransform2;
 import com.team2910.lib.math.Rotation2;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Compressor;
@@ -27,6 +30,7 @@ public class Superstructure extends Subsystem {
     private final Shooter mShooter = Shooter.getInstance();
     private final Hood mHood = Hood.getInstance();
     private final Indexer mIndexer = Indexer.getInstance();
+    private final RobotState mRobotState = RobotState.getInstance();
 
     private boolean mWantsShoot = false;
     private boolean mWantsSpinUp = false;
@@ -58,7 +62,7 @@ public class Superstructure extends Subsystem {
     private boolean mEnforceAutoAimMinDistance = false;
     private double mAutoAimMinDistance = 500;
 
-    private Rotation2d mFieldRelativeAimingGoal = null;
+    private Rotation2 mFieldRelativeAimingGoal = null;
 
     private boolean mHasTarget = false;
     private boolean mOnTarget = false;
@@ -234,18 +238,8 @@ public class Superstructure extends Subsystem {
     }
 
     public void safetyReset() {
-        if (mAimSetpoint < Constants.kTurretConstants.kMinUnitsLimit) {
-            mAimSetpoint += SuperstructureConstants.kTurretDOF;
-            Limelight.getInstance().setLed(Limelight.LedMode.OFF);
-            mDisableLimelight = true;
-        } else if (mAimSetpoint > Constants.kTurretConstants.kMaxUnitsLimit) {
-            mAimSetpoint -= SuperstructureConstants.kTurretDOF;
-            Limelight.getInstance().setLed(Limelight.LedMode.OFF);
-            mDisableLimelight = true;
-        } else {
-            mDisableLimelight = false;
-            Limelight.getInstance().setLed(Limelight.LedMode.ON);
-        }
+        Limelight.getInstance().setLed(Limelight.LedMode.OFF);
+        mDisableLimelight = true;
 
         if (mHoodSetpoint < Constants.kHoodConstants.kMinUnitsLimit) {
             // logic for when hood fully in]
@@ -268,6 +262,101 @@ public class Superstructure extends Subsystem {
         } else if (Util.epsilonEquals(mHood.getAngle(), Constants.kHoodConstants.kMaxUnitsLimit - 10, 10.0)) {
             mHoodSetpoint = Constants.kHoodConstants.kMinUnitsLimit + 10;
         }
+    }
+
+    public synchronized void maybeUpdateGoalFromVision(double timestamp) {
+
+        if (mAimingMode != AimingControlModes.VISION_AIMED) {
+            resetAimingParameters();
+            return;
+        }
+
+        if (mWantsShoot && mGotSpunUp) {
+            mLatestAimingParameters = mRobotState.getAimingParameters(mUseInnerTarget, 0, Constants.kMaxGoalTrackAge);
+            //System.out.println("ye we settin it to trackid");
+        } else {
+            mLatestAimingParameters = mRobotState.getAimingParameters(mUseInnerTarget, 1, Constants.kMaxGoalTrackAge);
+            //System.out.println("ye we got it to a track -1");
+        }
+
+        if (mLatestAimingParameters.isPresent()) {
+            mTrackId = mLatestAimingParameters.get().getTrackId();
+
+            RigidTransform2 robot_to_predicted_robot = mRobotState.getLatestFieldToVehicle().getValue().inverse()
+                    .transformBy(mRobotState.getPredictedFieldToVehicle(Constants.kAutoAimPredictionTime));
+            RigidTransform2 predicted_turret_to_goal = robot_to_predicted_robot.inverse()
+                    .transformBy(mLatestAimingParameters.get().getTurretToGoal());
+            mCorrectedRangeToTarget = predicted_turret_to_goal.getTranslation().norm();
+
+            System.out.println("has current aiming parameters");
+
+            // Don't aim if not in min distance
+            if (mEnforceAutoAimMinDistance && mCorrectedRangeToTarget > mAutoAimMinDistance) {
+                System.out.println("Not meeting aiming recs");
+                return;
+            }
+
+            final double shooting_setpoint = getShootingSetpointRpm(mCorrectedRangeToTarget);
+            mShooterSetpoint = shooting_setpoint;
+
+            final double aiming_setpoint = getHoodSetpointAngle(mCorrectedRangeToTarget);
+
+            if (!mWantsHoodScan) {
+                mHoodSetpoint = aiming_setpoint;
+            }
+
+            final Rotation2 aiming_error = mRobotState.getVehicleToTurret(timestamp).getRotation().inverse()
+                    .rotateBy(mLatestAimingParameters.get().getTurretToGoalRotation());
+
+            mAimSetpoint = mCurrentAim + /* - */ aiming_error.toDegrees(); // might switch to subtraction of error
+            final Twist2d velocity = mRobotState.getMeasuredVelocity();
+            // Angular velocity component from tangential robot motion about the goal.
+            final double tangential_component = mLatestAimingParameters.get().getTurretToGoalRotation().sin
+                    * velocity.dx / mLatestAimingParameters.get().getRange();
+            final double angular_component = UnitConversion.radians_to_degrees(velocity.dtheta);
+            // Add (opposite) of tangential velocity about goal + angular velocity in local
+            // frame.
+            mTurretFeedforwardV = -(angular_component + tangential_component);
+
+            safetyReset();
+
+            mHasTarget = true;
+            final double hood_error = mCurrentHood - mHoodSetpoint;
+
+            if (Util.epsilonEquals(aiming_error.toDegrees(), 0.0, 3.0) && Util.epsilonEquals(hood_error, 0.0, 3.0)) {
+                mOnTarget = true;
+            } else {
+                mOnTarget = false;
+            }
+
+        } else {
+
+            //System.out.println("No aiming paramenters :O");
+            mHasTarget = false;
+            mOnTarget = false;
+        }
+    }
+
+    public synchronized void maybeUpdateGoalFromFieldRelativeGoal(double timestamp) {
+        if (mAimingMode != AimingControlModes.FIELD_RELATIVE && mAimingMode != AimingControlModes.VISION_AIMED) {
+            mFieldRelativeAimingGoal = null;
+            return;
+        }
+        if (mAimingMode == AimingControlModes.VISION_AIMED && !mLatestAimingParameters.isEmpty()) {
+            // Vision will control the turret.
+            return;
+        }
+        if (mFieldRelativeAimingGoal == null) {
+            return;
+        }
+        final double kLookaheadTime = 4.0;
+        Rotation2 turret_error = mRobotState.getPredictedFieldToVehicle(timestamp + kLookaheadTime) // getPredictedFieldToVehicle
+                .transformBy(mRobotState.getVehicleToTurret(timestamp)).getRotation().inverse()
+                .rotateBy(mFieldRelativeAimingGoal);
+        // System.out.println("Turret Error" + turret_error);
+        mAimSetpoint =  /* - */ turret_error.toDegrees();
+        // System.out.println("turret error " + turret_error.toDegrees());
+        safetyReset();
     }
 
     @Override
