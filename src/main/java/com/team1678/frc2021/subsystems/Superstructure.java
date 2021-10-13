@@ -8,12 +8,15 @@ import com.team1678.frc2021.loops.ILooper;
 import com.team1678.frc2021.loops.Loop;
 import com.team1678.lib.util.InterpolatingDouble;
 import com.team1678.lib.util.Util;
+import com.team254.lib.vision.AimingParameters;
+import com.team2910.lib.math.Rotation2;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class Superstructure extends Subsystem {
 
@@ -35,22 +38,37 @@ public class Superstructure extends Subsystem {
     private boolean mWantsUnjam = false;
     private boolean mWantsHoodScan = false;
 
-    private double mCurrentHood = 0.0;
-
     private double mAngleAdd = 0.0;
+
+    private double mAimSetpoint = 0.0;
     private double mHoodSetpoint = 70.5;         // TODO correct
     private double mShooterSetpoint = 4000.0;    // TODO correct
-    private double mCorrectedRangeToTarget = 0.0;
+
+    private double mCurrentAim = 0.0;
+    private double mCurrentHood = 0.0;
 
     private boolean mGotSpunUp = false;
     private boolean mEnableIndexer = false;
     private boolean mManualZoom = false;
+    private boolean mDisableLimelight = false;
 
-    private Rotation2d mFieldRelativeTurretGoal = null;
+    private double mHoodFeedforwardV = 0.0;
+    private Optional<AimingParameters> mLatestAimingParameters = Optional.empty();
+    private double mCorrectedRangeToTarget = 0.0;
+    private boolean mEnforceAutoAimMinDistance = false;
+    private double mAutoAimMinDistance = 500;
+
+    private Rotation2d mFieldRelativeAimingGoal = null;
 
     private boolean mHasTarget = false;
     private boolean mOnTarget = false;
     private int mTrackId = -1;
+
+    enum AimingControlModes {
+        FIELD_RELATIVE, VISION_AIMED, OPEN_LOOP, JOGGING
+    }
+
+    private AimingControlModes mAimingMode = AimingControlModes.FIELD_RELATIVE;
 
     private Superstructure() {
         // The superstructure class
@@ -79,6 +97,10 @@ public class Superstructure extends Subsystem {
             disabledState();
         }
     };
+
+    private double rotation2ToDegrees(Rotation2 angle) {
+        return angle.toDegrees();
+    }
 
     public synchronized void enableIndexer(boolean indexer) {
         mEnableIndexer = indexer;
@@ -117,12 +139,12 @@ public class Superstructure extends Subsystem {
     }
 
     @Override
-    public void registerEnabledLoops(ILooper enabledLooper) {
+    public void registerEnabledLoops(ILooper mEnabledLooper) {
         mEnabledLooper.register(new Loop() {
             @Override
             public void onStart(double timestamp) {
                 synchronized (Superstructure.this) {
-                    mTurretMode = TurretControlModes.FIELD_RELATIVE;
+                    mAimingMode = AimingControlModes.FIELD_RELATIVE;
                     if (SuperstructureConstants.kUseSmartdashboard) {
                         SmartDashboard.putNumber("Shooting RPM", mShooterSetpoint);
                         SmartDashboard.putNumber("Hood Angle", mHoodSetpoint);
@@ -133,7 +155,8 @@ public class Superstructure extends Subsystem {
             @Override
             public void onLoop(double timestamp) {
                 synchronized (Superstructure.this) {
-                    updateHoodState();
+                    updateCurrentState();
+                    maybeUpdateGoalFromVision(timestamp);
                     maybeUpdateGoalFromFieldRelativeGoal(timestamp);
                     maybeUpdateGoalFromHoodScan(timestamp);
                     followSetpoint();
@@ -182,20 +205,19 @@ public class Superstructure extends Subsystem {
         mWantsHoodScan = scan;
     }
 
-    public synchronized void setGoal(double shooter, double hood, double turret) {
-        if ((mTurretMode == TurretControlModes.VISION_AIMED && mHasTarget)) {
+    public synchronized void setGoal(double shooter, double hood, double aim) {
+        if ((mAimingMode == AimingControlModes.VISION_AIMED && mHasTarget)) {
             // Keep current setpoints
         } else {
-            mTurretSetpoint = turret;
+            mAimSetpoint = aim;
             mHoodSetpoint = hood;
             mShooterSetpoint = shooter;
         }
     }
 
-    ublic synchronized void resetAimingParameters() {
+    public synchronized void resetAimingParameters() {
         mHasTarget = false;
         mOnTarget = false;
-        mTurretFeedforwardV = 0.0;
         mTrackId = -1;
         mLatestAimingParameters = Optional.empty();
     }
@@ -205,7 +227,7 @@ public class Superstructure extends Subsystem {
     }
 
     public synchronized void updateCurrentState() {
-        mCurrentTurret = mTurret.getAngle();
+        mCurrentAim = rotation2ToDegrees(Swerve.getGyroAngle());
         mCurrentHood = mHood.getAngle();
     }
 
@@ -221,8 +243,8 @@ public class Superstructure extends Subsystem {
         mAngleAdd -= add;
     }
 
-    public synchronized TurretControlModes getTurretControlMode() {
-        return mTurretMode;
+    public synchronized AimingControlModes getAimingControlMode() {
+        return mAimingMode;
     }
 
     public synchronized boolean getScanningHood() {
@@ -230,12 +252,12 @@ public class Superstructure extends Subsystem {
     }
 
     public void safetyReset() {
-        if (mTurretSetpoint < Constants.kTurretConstants.kMinUnitsLimit) {
-            mTurretSetpoint += SuperstructureConstants.kTurretDOF;
+        if (mAimSetpoint < Constants.kTurretConstants.kMinUnitsLimit) {
+            mAimSetpoint += SuperstructureConstants.kTurretDOF;
             Limelight.getInstance().setLed(Limelight.LedMode.OFF);
             mDisableLimelight = true;
-        } else if (mTurretSetpoint > Constants.kTurretConstants.kMaxUnitsLimit) {
-            mTurretSetpoint -= SuperstructureConstants.kTurretDOF;
+        } else if (mAimSetpoint > Constants.kTurretConstants.kMaxUnitsLimit) {
+            mAimSetpoint -= SuperstructureConstants.kTurretDOF;
             Limelight.getInstance().setLed(Limelight.LedMode.OFF);
             mDisableLimelight = true;
         } else {

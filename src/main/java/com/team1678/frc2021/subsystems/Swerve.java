@@ -259,6 +259,12 @@ public class Swerve implements Subsystem, UpdateManager.Updatable {
         }
     }
 
+    public static Rotation2 getGyroAngle() {
+        synchronized (sensorLock) {
+            return gyroscope.getAngle();
+        }
+    }
+
     public void resetGyroAngle(Rotation2 angle) {
         synchronized (sensorLock) {
             gyroscope.setAdjustmentAngle(
