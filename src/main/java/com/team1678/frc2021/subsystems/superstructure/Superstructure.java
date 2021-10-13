@@ -42,6 +42,7 @@ public class Superstructure extends Subsystem {
     private double mAngleAdd = 0.0;
 
     private double mAimSetpoint = 0.0;
+    private double mTurnAimSetpoint = 0.0;
     private double mHoodSetpoint = 70.5;         // TODO correct
     private double mShooterSetpoint = 4000.0;    // TODO correct
 
@@ -215,6 +216,15 @@ public class Superstructure extends Subsystem {
         return mDisableLimelight;
     }
 
+    /**
+     * Gets the turn needed by the drivetrain to aim
+     * TODO add this to Swerve so the aiming works
+     * @return how much to turn
+     */
+    public synchronized double getTurnNeeded() {
+        return mTurnAimSetpoint;
+    }
+
     public synchronized void updateCurrentState() {
         mCurrentAim = getGyroDegrees();
         mCurrentHood = mHood.getAngle();
@@ -291,9 +301,9 @@ public class Superstructure extends Subsystem {
 
             RigidTransform2 robot_to_predicted_robot = mRobotState.getLatestFieldToVehicle().getValue().inverse()
                     .transformBy(mRobotState.getPredictedFieldToVehicle(Constants.kAutoAimPredictionTime));
-            RigidTransform2 predicted_turret_to_goal = robot_to_predicted_robot.inverse()
+            RigidTransform2 predicted_aim_to_goal = robot_to_predicted_robot.inverse()
                     .transformBy(mLatestAimingParameters.get().getTurretToGoal());
-            mCorrectedRangeToTarget = predicted_turret_to_goal.getTranslation().norm();
+            mCorrectedRangeToTarget = predicted_aim_to_goal.getTranslation().norm();
 
             System.out.println("has current aiming parameters");
 
@@ -323,7 +333,7 @@ public class Superstructure extends Subsystem {
             final double angular_component = UnitConversion.radians_to_degrees(velocity.dtheta);
             // Add (opposite) of tangential velocity about goal + angular velocity in local
             // frame.
-            mTurretFeedforwardV = -(angular_component + tangential_component);
+            //mAimFeedforwardV = -(angular_component + tangential_component);
 
             safetyReset();
 
@@ -350,19 +360,19 @@ public class Superstructure extends Subsystem {
             return;
         }
         if (mAimingMode == AimingControlModes.VISION_AIMED && !mLatestAimingParameters.isEmpty()) {
-            // Vision will control the turret.
+            // Vision will control the aim.
             return;
         }
         if (mFieldRelativeAimingGoal == null) {
             return;
         }
         final double kLookaheadTime = 4.0;
-        Rotation2 turret_error = mRobotState.getPredictedFieldToVehicle(timestamp + kLookaheadTime) // getPredictedFieldToVehicle
+        Rotation2 aim_error = mRobotState.getPredictedFieldToVehicle(timestamp + kLookaheadTime) // getPredictedFieldToVehicle
                 .transformBy(mRobotState.getVehicleToTurret(timestamp)).getRotation().inverse()
                 .rotateBy(mFieldRelativeAimingGoal);
-        // System.out.println("Turret Error" + turret_error);
-        mAimSetpoint =  /* - */ turret_error.toDegrees();
-        // System.out.println("turret error " + turret_error.toDegrees());
+        // System.out.println("aim Error" + aim_error);
+        mAimSetpoint =  /* - */ aim_error.toDegrees();
+        // System.out.println("aim error " + aim_error.toDegrees());
         safetyReset();
     }
 
@@ -484,16 +494,12 @@ public class Superstructure extends Subsystem {
 
 //        Limelight.getInstance().setPipeline(Limelight.kDefaultPipeline);
 
-        if (mTurretMode == TurretControlModes.OPEN_LOOP || !mEnableIndexer) {
-            mTurret.setOpenLoop(0);
-            // } else if (mTurretMode == TurretControlModes.VISION_AIMED) {
-            // mTurret.setSetpointPositionPID(mTurretSetpoint, mTurretFeedforwardV);
+        if (mAimingMode == AimingControlModes.OPEN_LOOP || !mEnableIndexer) {
+            // Noting happnes, hull aimed
         } else {
-            mTurret.setSetpointMotionMagic(mTurretSetpoint);
+            mTurnAimSetpoint = mAimSetpoint;
         }
-        //mTurret.setOpenLoop(0);
         // mHood.setOpenLoop(0);
-        estim_popout = trigger_popout.update(real_popout, 0.2);
     }
 
     @Override
