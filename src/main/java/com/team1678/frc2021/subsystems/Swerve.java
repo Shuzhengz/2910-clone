@@ -43,7 +43,7 @@ import com.team2910.lib.util.HolonomicFeedforward;
 public class Swerve implements Subsystem, UpdateManager.Updatable {
 
 	private static Swerve instance = null;
-	
+
 	public static Swerve getInstance(){
 		if(instance == null)
 			instance = new Swerve();
@@ -80,9 +80,13 @@ public class Swerve implements Subsystem, UpdateManager.Updatable {
     );
     
     private final Object sensorLock = new Object();
+    private static final Object sensorLockStatic = new Object();
 
     @GuardedBy("sensorLock")
     private Gyroscope gyroscope = new Pigeon(Ports.PIGEON_TALON);
+
+    @GuardedBy("sensorLockStatic")
+    private static Gyroscope gyroStatic = new Pigeon(Ports.PIGEON_TALON);
 
     private final Object kinematicsLock = new Object();
     @GuardedBy("kinematicsLock")
@@ -91,6 +95,7 @@ public class Swerve implements Subsystem, UpdateManager.Updatable {
     private RigidTransform2 pose = RigidTransform2.ZERO;
 
     private final Object stateLock = new Object();
+
     @GuardedBy("stateLock")
     private HolonomicDriveSignal driveSignal = null;
 
@@ -260,9 +265,9 @@ public class Swerve implements Subsystem, UpdateManager.Updatable {
         }
     }
 
-    public  Rotation2 getGyroAngle() {
-        synchronized (sensorLock) {
-            return gyroscope.getAngle();
+    public static Rotation2 getGyroAngle() {
+        synchronized (sensorLockStatic) {
+            return gyroStatic.getAngle();
         }
     }
 
