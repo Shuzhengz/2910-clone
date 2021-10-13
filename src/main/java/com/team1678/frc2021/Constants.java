@@ -6,6 +6,7 @@ import java.util.List;
 import com.team1323.lib.util.InterpolatingDouble;
 import com.team1323.lib.util.InterpolatingTreeMap;
 import com.team1678.frc2021.subsystems.Limelight.LimelightConstants;
+import com.team1678.frc2021.subsystems.ServoMotorSubsystem;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
@@ -50,11 +51,8 @@ public class Constants {
 	
 
 	 // Indexer
-	 public static final int kSlot0Proxy = 1;
-	 public static final int kSlot1Proxy = 2;
-	 public static final int kSlot2Proxy = 3;
-	 public static final int kSlot3Proxy = 4;
-	 public static final int kSlot4Proxy = 5;
+	 public static final int kLowerBeamBreak = 1;      // TODO Find actual port
+	 public static final int kUpperBeamBreak = 2;      // TODO Find actual port
 	 public static final int kIndexerLimitSwitch = 6;
  
 	 public static final double kIndexerKp = 0.2;
@@ -65,14 +63,19 @@ public class Constants {
 	 public static final double kIndexerVelocityKi = 0.;
 	 public static final double kIndexerVelocityKd = 0.;
 	 public static final double kIndexerVelocityKf = .05;
-	 public static final int kIndexerMaxVelocity = 20000; // ticks / 100ms
-	 public static final int kIndexerMaxAcceleration = 40000; // ticks / 100ms / sec
+	 public static final int kIndexerMaxVelocity = 20000; // ticks / 100ms, TODO test for actual value
+	 public static final int kIndexerMaxAcceleration = 40000; // ticks / 100ms / sec, TODO test for actual value
  
 	 public static final int kIndexerSlots = 5;
-	 public static final int kAnglePerSlot = 360 / kIndexerSlots;
-	 public static final double kIndexerDeadband = 2.0; // degrees
+	 public static final int kDistancePerSlot = 360 / kIndexerSlots;		// TODO Find Actual Distance
+	 public static final int kTotalDistance = 5000;                         // TODO Find Actual Distance
 
-	 public static final int kIndexerId = 7; 
+	 public static final int kIndexerId = 7;
+
+	 public static final double kZoomingVelocity = 80.;
+
+	 public static final boolean[] kFullSlots = {true, true, true };
+	 public static final boolean[] kEmptySlots = {false, false, false };
 
 	// shooter
 	public static final int kMasterFlywheelID = 14;
@@ -89,6 +92,49 @@ public class Constants {
 	public static final double kTriggerF = 0.05;
 
 	public static final double kTriggerRPM = 5000.0;
+
+	// hood
+	public static final ServoMotorSubsystem.ServoMotorSubsystemConstants kHoodConstants = new ServoMotorSubsystem.ServoMotorSubsystemConstants();
+	static {
+		kHoodConstants.kName = "Hood";
+
+		kHoodConstants.kMasterConstants.id = 8;
+		kHoodConstants.kMasterConstants.invert_motor = true;
+		kHoodConstants.kMasterConstants.invert_sensor_phase = false;
+
+		// Unit == Degrees
+		kHoodConstants.kHomePosition = 0.0; // Degrees
+		kHoodConstants.kTicksPerUnitDistance = (2048.0 * 93.8) / 360.0;
+		kHoodConstants.kKp = 0.5;
+		kHoodConstants.kKi = 0;
+		kHoodConstants.kKd = 0;
+		kHoodConstants.kKf = 0.05;
+		kHoodConstants.kMaxIntegralAccumulator = 0;
+		kHoodConstants.kIZone = 0; // Ticks
+		kHoodConstants.kDeadband = 0; // Ticks
+
+		kHoodConstants.kPositionKp = 0.1;
+		kHoodConstants.kPositionKi = 0;
+		kHoodConstants.kPositionKd = 0;
+		kHoodConstants.kPositionKf = 0.0;
+		kHoodConstants.kPositionMaxIntegralAccumulator = 0;
+		kHoodConstants.kPositionIZone = 0; // Ticks
+		kHoodConstants.kPositionDeadband = 0; // Ticks
+
+		// degrees of limelight pitch from horiz
+		kHoodConstants.kMinUnitsLimit = 17.66;
+		kHoodConstants.kMaxUnitsLimit = 89.5;
+
+		kHoodConstants.kCruiseVelocity = 20000; // Ticks / 100ms
+		kHoodConstants.kAcceleration = 20000; // Ticks / 100ms / s
+		kHoodConstants.kRampRate = 0.0; // s
+		kHoodConstants.kContinuousCurrentLimit = 35; // amps
+		kHoodConstants.kPeakCurrentLimit = 40; // amps
+		kHoodConstants.kPeakCurrentDuration = 10; // milliseconds
+		kHoodConstants.kMaxVoltage = 6;
+
+		kHoodConstants.kAbsoluteEncoderID = 3;
+	}
 
 	// limelight
 	 public static final LimelightConstants kLimelightConstants = new LimelightConstants();
@@ -174,7 +220,8 @@ public class Constants {
 
 	public static double kSwerveRotationMotorTicksPerRotation = 2048 * 12.4;
 
-	public static int kIntakeRollerId = 3;
+	public static int kMasterIntakeRollerId = 3;
+	public static int kSlaverIntakeRollerId = 6; //TODO Check real ID
 	public static int kDeploySolenoidId = 4;
 	public static int kShiftSolenoidId = 5;
 	public static int kDeployId = 31;
@@ -184,10 +231,10 @@ public class Constants {
 	public static final int kFrontRightDriveId = 13;
 
 	public static final int kFrontLeftRotationId = 8;
-	public static final int kFrontLeftDriveId = 4;
+	public static final int kFrontLeftDriveId = 3;
 	
 	public static final int kBackLeftRotationId = 5;
-	public static final int kBackLeftDriveId = 1;
+	public static final int kBackLeftDriveId = 4;
 	
 	public static final int kBackRightRotationId = 12;
 	public static final int kBackRightDriveId = 16;

@@ -30,4 +30,7 @@ public class Ports {
     public static final int BALL_INTAKE_PROXY  = 0;
     public static final int DISK_INTAKE_BANNER = 1;
 
-    }
+    //CANifier
+    public static final int CANIFIER = 23; // TODO find real port
+
+}

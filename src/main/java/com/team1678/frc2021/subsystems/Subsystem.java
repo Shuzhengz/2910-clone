@@ -31,7 +31,7 @@ public abstract class Subsystem {
     public void zeroSensors() {
     }
 
-    public void registerEnabledLoops(ILooper enabledLooper) {
+    public void registerEnabledLoops(ILooper mEnabledLooper) {
     }
 
     public abstract boolean checkSystem();
