@@ -63,10 +63,10 @@ public class RobotContainer {
     /* Driver Buttons */
     zeroGyro.whenPressed(new InstantCommand(() -> s_Swerve.zeroGyro()));
     // Snap Commands
-    //yButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(0)));
-    //bButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(90)));
-    //aButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(180)));
-    //xButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(270)));    
+    yButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(0)));
+    bButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(90)));
+    aButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(180)));
+    xButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(270)));    
   }
 
   /**

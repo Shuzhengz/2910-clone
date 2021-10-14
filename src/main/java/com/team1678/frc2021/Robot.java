@@ -21,9 +21,6 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   public RobotContainer robotContainer;
-
-  private RobotContainer m_robotContainer;
-
   /**
    * This function is run when the 3 is first started up and should be used for any
    * initialization code.

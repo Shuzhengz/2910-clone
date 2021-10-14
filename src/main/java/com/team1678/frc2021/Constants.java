@@ -377,7 +377,7 @@ public class Constants {
         public static final boolean driveEnableCurrentLimit = true;
 
         /* Angle Motor PID Values */
-        public static final double angleKP = 0.01;
+        public static final double angleKP = 0.05;
         public static final double angleKI = 0.0;
         public static final double angleKD = 0.0;
         public static final double angleKF = 0.0;
@@ -403,7 +403,7 @@ public class Constants {
 
         /* Motor Inverts */
         public static final boolean driveMotorInvert = false;
-        public static final boolean angleMotorInvert = true;
+        public static final boolean angleMotorInvert = false;
 
         /* Angle Encoder Invert */
         public static final boolean canCoderInvert = false;
@@ -414,7 +414,7 @@ public class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 7;
             public static final int canCoderID = 23;
-            public static final double angleOffset = 274;
+            public static final double angleOffset = 104;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -424,7 +424,7 @@ public class Constants {
             public static final int driveMotorID = 13;
             public static final int angleMotorID = 10;
             public static final int canCoderID = 20;
-            public static final double angleOffset = 66;
+            public static final double angleOffset = 236;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -434,7 +434,7 @@ public class Constants {
             public static final int driveMotorID = 4;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 22;
-            public static final double angleOffset = 145;
+            public static final double angleOffset = 318;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -444,11 +444,26 @@ public class Constants {
             public static final int driveMotorID = 14;
             public static final int angleMotorID = 9;
             public static final int canCoderID = 21;
-            public static final double angleOffset = 308;
+            public static final double angleOffset = 101;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
+	}
+	
+	public static final class SnapConstants {
+        public static final double snapKP = 5;
+        public static final double snapKI = 0;
+        public static final double snapKD = 0;
+        public static final double snapTimeout = 0.25;
+        public static final double snapEpsilon = 1.0;
 
+        //Constraints for the profiled angle controller (vals stolen from AutoConstants)
+        public static final double kMaxAngularSpeedRadiansPerSecond = 4*Math.PI;
+        public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.pow(kMaxAngularSpeedRadiansPerSecond, 2);
+
+        public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
     }
 
     public static final class AutoConstants {

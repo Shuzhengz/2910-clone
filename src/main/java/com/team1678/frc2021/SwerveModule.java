@@ -16,7 +16,7 @@ import com.team1678.lib.util.CTREModuleState;
 
 public class SwerveModule {
     public int moduleNumber;
-    private double angleOffset;
+    public double angleOffset;
     private TalonFX mAngleMotor;
     private TalonFX mDriveMotor;
     private CANCoder angleEncoder;
