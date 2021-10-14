@@ -3,11 +3,15 @@
 // the WPILib BSD license file in the root directory of this project.
 package com.team1678.frc2021;
 
+<<<<<<< HEAD
+import edu.wpi.first.wpilibj.TimedRobot;
+=======
 import com.team1678.frc2021.subsystems.Swerve;
 import com.team2910.lib.robot.UpdateManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+>>>>>>> swerve
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -16,6 +20,62 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
+<<<<<<< HEAD
+  /**
+   * This function is run when the robot is first started up and should be used
+   * for any initialization code.
+   */
+  @Override
+  public void robotInit() {
+    // TODO: Initialise hood and do hood setpoint login in Superstructure.
+    swerve = Swerve.getInstance();
+    robotContainer = new RobotContainer();
+    updateManager = new UpdateManager(
+        robotContainer.getDrivetrainSubsystem()
+      );
+      updateManager.startLoop(5.0e-3);
+
+    // instantiate subsystems\
+		mIntake = Intake.getInstance();
+		mSuperstructure = Superstructure.getInstance();
+		mShooter = Shooter.getInstance();
+		mIndexer = Indexer.getInstance();
+		mHood = Hood.getInstance();	
+		mLimelight = Limelight.getInstance();
+        
+    subsystems = new SubsystemManager(
+    //Arrays.asList(swerve, Intake, mSuperstructure, mIndexer/*, leds*/));
+		Arrays.asList(/*mLEDs,*/
+			mHood,
+			mLimelight,
+			mIntake,
+			mIndexer,
+		  	mShooter,
+			mSuperstructure,
+			mInfrastructure
+			));
+
+		Logger.clearLog();
+		
+		operator = new Xbox(1);
+
+        enabledLooper.register(QuinticPathTransmitter.getInstance());
+        enabledLooper.register(LimelightProcessor.getInstance());
+        disabledLooper.register(QuinticPathTransmitter.getInstance());
+        disabledLooper.register(LimelightProcessor.getInstance());
+        subsystems.registerEnabledLoops(enabledLooper);
+		subsystems.registerDisabledLoops(disabledLooper);
+		//CommandScheduler.getInstance().registerSubsystem(swerve);
+
+        // swerve.zeroSensors();
+        // swerve.zeroSensors(new Pose2d());
+		// swerve.stop();
+		swerve.startLogging();
+        smartDashboardInteractions.initWithDefaults();
+
+
+        // generator.generateTrajectories();
+=======
   public static CTREConfigs ctreConfigs;
 
   private Command m_autonomousCommand;
@@ -35,6 +95,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
       // TODO: Initialise hood and do hood setpoint login in Superstructure.
       robotContainer = new RobotContainer();
+>>>>>>> swerve
   }
 
   /**
@@ -45,12 +106,16 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
+<<<<<<< HEAD
+  public void autonomousInit() {
+=======
   public void robotPeriodic() {
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the 3's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+>>>>>>> swerve
   }
 
   /** This function is called once each time the 3 enters Disabled mode. */
@@ -62,6 +127,9 @@ public class Robot extends TimedRobot {
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
+<<<<<<< HEAD
+  public void autonomousPeriodic() {
+=======
   public void autonomousInit() {
     /*
     Autonomous code which is not working right now.
@@ -71,10 +139,18 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }*/
+>>>>>>> swerve
   }
 
   /** This function is called periodically during autonomous. */
   @Override
+<<<<<<< HEAD
+  public void teleopInit() {
+  }
+
+  @Override
+  public void teleopPeriodic() {
+=======
   public void autonomousPeriodic() {}
 
   @Override
@@ -86,10 +162,22 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+>>>>>>> swerve
   }
 
   /** This function is called periodically during operator control. */
   @Override
+<<<<<<< HEAD
+  public void testInit() {
+  }
+
+  @Override
+  public void testPeriodic() {
+  }
+
+
+}
+=======
   public void teleopPeriodic() {}
 
   @Override
@@ -102,3 +190,4 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {}
 }
+>>>>>>> swerve

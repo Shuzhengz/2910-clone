@@ -1,5 +1,6 @@
 package com.team2910.lib.commands;
 
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import com.team1678.frc2021.subsystems.Swerve;
@@ -24,13 +25,13 @@ public class DriveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        drivetrainSubsystem.drive(new Vector2(forward.get(true), strafe.get(true)), rotation.get(true)*0.5, true);
+        drivetrainSubsystem.drive(new Translation2d(forward.get(true), strafe.get(true)), rotation.get(true)*0.5, true, true);
     }
 
     @Override
     public void end(boolean interrupted) {
         //drivetrainSubsystem.drive(Vector2.ZERO, 0, false);
-        drivetrainSubsystem.disableRotationMotors();
+        //drivetrainSubsystem.disableRotationMotors();
         //drivetrainSubsystem.setModuleCoastMode();
     }
 }

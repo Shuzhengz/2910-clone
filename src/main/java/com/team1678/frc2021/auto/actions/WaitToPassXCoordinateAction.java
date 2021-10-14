@@ -15,12 +15,12 @@ public class WaitToPassXCoordinateAction implements Action{
 	@Override
 	public boolean isFinished() {
 		return Math.signum(startingXCoordinate - targetXCoordinate) !=
-				Math.signum(swerve.getPose().getTranslation().x() - targetXCoordinate);
+				Math.signum(swerve.getPose().getTranslation().getX() - targetXCoordinate);
 	}
 
 	@Override
 	public void start() {
-		startingXCoordinate = swerve.getPose().getTranslation().x();
+		startingXCoordinate = swerve.getPose().getTranslation().getX();
 	}
 
 	@Override

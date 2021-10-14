@@ -15,7 +15,7 @@ public class WaitForHeadingAction implements Action{
 	
 	@Override
 	public boolean isFinished(){
-		double heading = swerve.getPose().getRotation().toDegrees();
+		double heading = swerve.getPose().getRotation().getDegrees();
 		return heading >= lowThreshold && heading <= highThreshold;
 	}
 	
