@@ -87,7 +87,6 @@ public class Hood extends ServoMotorSubsystem {
             System.out.println("Homed!!!");
             mHoming = false;
         }
-        SmartDashboard.putNumber("Hood Encoder Readout", mEncoder.getDistance());
         super.readPeriodicInputs();
     }
 
@@ -118,6 +117,7 @@ public class Hood extends ServoMotorSubsystem {
 
         SmartDashboard.putBoolean(mConstants.kName + " Calibrated", !mHoming);
         SmartDashboard.putBoolean("Hood at Homing Location", atHomingLocation());
+        SmartDashboard.putNumber("Hood Encoder Readout", mEncoder.getDistance());
     }
 
     public void setCoastMode() {
