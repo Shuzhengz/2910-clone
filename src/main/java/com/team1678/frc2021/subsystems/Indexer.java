@@ -353,7 +353,7 @@ public class Indexer extends Subsystem {
         enabledLooper.register(new Loop() {
             @Override
             public void onStart(double timestamp) {
-                mState = State.IDLE;
+                mState = State.INDEXING;
             }
 
             @Override

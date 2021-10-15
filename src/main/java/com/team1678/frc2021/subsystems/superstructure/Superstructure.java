@@ -83,7 +83,7 @@ public class Superstructure extends Subsystem {
         // The superstructure class
     }
 
-    public synchronized Superstructure getInstance(){
+    public static synchronized Superstructure getInstance(){
         if(mInstance == null)
             mInstance = new Superstructure();
         return mInstance;
