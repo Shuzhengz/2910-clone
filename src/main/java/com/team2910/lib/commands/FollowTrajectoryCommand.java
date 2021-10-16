@@ -18,16 +18,17 @@ public class FollowTrajectoryCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        swerve.getFollower().follow(trajectory);
+        //swerve.getFollower().follow(trajectory);
     }
 
     @Override
     public void end(boolean interrupted) {
-        swerve.getFollower().cancel();
+        //swerve.getFollower().cancel();
     }
 
     @Override
     public boolean isFinished() {
-        return swerve.getFollower().getCurrentTrajectory().isEmpty();
+        return true;
+        //return swerve.getFollower().getCurrentTrajectory().isEmpty();
     }
 }

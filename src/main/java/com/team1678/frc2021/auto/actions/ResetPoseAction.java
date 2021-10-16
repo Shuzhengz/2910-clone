@@ -22,8 +22,8 @@ public class ResetPoseAction extends RunOnceAction{
 
 	@Override
 	public void runOnce() {
-		swerve.setStartingPose(newPose);
-		swerve.zeroSensors(newPose); // TODO: Fix zeroSensors method
+		//swerve.setStartingPose(newPose);
+		//swerve.zeroSensors(newPose); // TODO: Fix zeroSensors method
 	}
 
 }

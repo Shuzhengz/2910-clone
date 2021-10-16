@@ -11,6 +11,10 @@ public class Pigeon extends Gyroscope {
         pigeon = new PigeonIMU(canId);
     }
 
+    public PigeonIMU getPigeonIMU() {
+        return pigeon;
+    }
+
     private static Pigeon instance = null;
     public static Pigeon getInstance(){
 		if(instance == null){

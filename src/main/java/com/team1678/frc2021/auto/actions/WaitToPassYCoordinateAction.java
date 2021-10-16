@@ -15,12 +15,12 @@ public class WaitToPassYCoordinateAction implements Action{
 	@Override
 	public boolean isFinished() {
 		return Math.signum(startingYCoordinate - targetYCoordinate) !=
-				Math.signum(swerve.getPose().getTranslation().y() - targetYCoordinate);
+				Math.signum(swerve.getPose().getTranslation().getY() - targetYCoordinate);
 	}
 
 	@Override
 	public void start() {
-		startingYCoordinate = swerve.getPose().getTranslation().y();
+		startingYCoordinate = swerve.getPose().getTranslation().getY();
 	}
 
 	@Override
