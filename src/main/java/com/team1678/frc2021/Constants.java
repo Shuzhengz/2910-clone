@@ -43,7 +43,7 @@ public class Constants {
 
 	public static final double kBallRadius = 6.5;
 
-	public static final int kCanifierId = 23;
+	public static final int kCanifierId = 24;
 
 	//Drivetrain
 	public static final double kDriveSteeringKp = 0.3;
@@ -83,10 +83,9 @@ public class Constants {
 	 public static final boolean[] kEmptySlots = {false, false, false };
 
 	// shooter
-	public static final int kMasterFlywheelID = 14;
+	public static final int kMasterFlywheelID = 2;
 	public static final int kSlaveFlywheelID = 15;
-	public static final int kTriggerWheelID = 10;
-	public static final int kTriggerPopoutSolenoidID = 6;
+	public static final int kOverheadFlywheelID = 16;
 	public static final double kShooterP = 0.2;
 	public static final double kShooterI = 0.00004;
 	public static final double kShooterD = 0.0;
@@ -103,7 +102,7 @@ public class Constants {
 	static {
 		kHoodConstants.kName = "Hood";
 
-		kHoodConstants.kMasterConstants.id = 8;
+		kHoodConstants.kMasterConstants.id = 6;
 		kHoodConstants.kMasterConstants.invert_motor = true;
 		kHoodConstants.kMasterConstants.invert_sensor_phase = false;
 
@@ -225,8 +224,8 @@ public class Constants {
 
 	public static double kSwerveRotationMotorTicksPerRotation = 2048 * 12.4;
 
-	public static int kMasterIntakeRollerId = 3;
-	public static int kSlaverIntakeRollerId = 6; //TODO Check real ID
+	public static int kMasterIntakeRollerId = 5;
+	public static int kSlaverIntakeRollerId = 11; //TODO Check real ID
 	public static int kDeploySolenoidId = 4;
 	public static int kShiftSolenoidId = 5;
 	public static int kDeployId = 31;
@@ -261,9 +260,6 @@ public class Constants {
         throw new IllegalArgumentException("Solenoid ID not valid: " + solenoidId);
 	}
 	
-	// Climber
-	public static final int kClimberId = 3;
-
 	static{
 		kVisionSpeedTreemap.put(new InterpolatingDouble(-6.0), new InterpolatingDouble(24.0));
 		kVisionSpeedTreemap.put(new InterpolatingDouble(kClosestVisionDistance), new InterpolatingDouble(24.0));

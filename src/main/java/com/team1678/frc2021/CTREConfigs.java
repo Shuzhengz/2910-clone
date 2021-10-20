@@ -13,7 +13,7 @@ public final class CTREConfigs {
     public CANCoderConfiguration swerveCanCoderConfig;
 
 
-    public CTREConfigs(){
+    public CTREConfigs() {
         swerveAngleFXConfig = new TalonFXConfiguration();
         swerveDriveFXConfig = new TalonFXConfiguration();
         swerveCanCoderConfig = new CANCoderConfiguration();
@@ -56,8 +56,5 @@ public final class CTREConfigs {
         swerveCanCoderConfig.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
         swerveCanCoderConfig.sensorTimeBase = SensorTimeBase.PerSecond;
 
-        
-
     }
-
 }

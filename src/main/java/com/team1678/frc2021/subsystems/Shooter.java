@@ -39,7 +39,7 @@ public class Shooter extends Subsystem {
     private Shooter() {
         //for flywheel motor
         mMaster = TalonFXFactory.createDefaultTalon(Constants.kMasterFlywheelID);
-        mMasterOverhead = TalonFXFactory.createDefaultTalon(Constants.kMasterFlywheelID);
+        mMasterOverhead = TalonFXFactory.createDefaultTalon(Constants.kOverheadFlywheelID);
         mSlave = TalonFXFactory.createPermanentSlaveTalon(Constants.kSlaveFlywheelID, Constants.kMasterFlywheelID);
 
         mMaster.set(ControlMode.PercentOutput, 0);
