@@ -3,12 +3,19 @@
 // the WPILib BSD license file in the root directory of this project.
 package com.team1678.frc2021;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.team1678.frc2021.loops.Looper;
 import com.team1678.frc2021.subsystems.*;
 import com.team1678.frc2021.subsystems.superstructure.Superstructure;
+import com.team1678.frc2021.controlboard.ControlBoard;
+
+import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.util.CrashTracker;
+import com.team2910.lib.math.RigidTransform2;
 import com.team2910.lib.robot.UpdateManager;
+
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -40,6 +47,7 @@ public class Robot extends TimedRobot {
     private final Intake mIntake = Intake.getInstance();
     private final Canifier mCanifier = Canifier.getInstance();
     private final LEDs mLEDs = LEDs.getInstance();
+    private final ControlBoard mControlBoard = ControlBoard.getInstance();
 
     private final RobotState mRobotState = RobotState.getInstance();
 
@@ -82,6 +90,31 @@ public class Robot extends TimedRobot {
         // autonomous chooser on the dashboard.
         // TODO: Initialise hood and do hood setpoint login in Superstructure.
         robotContainer = new RobotContainer();
+
+        try {
+            CrashTracker.logRobotInit();
+
+            mSubsystemManager.setSubsystems(
+                    mLEDs,
+                    mHood,
+                    mIntake,
+                    mShooter,
+                    mCanifier,
+                    mLimelight,
+                    mSuperstructure
+            );
+
+            mSubsystemManager.registerEnabledLoops(mEnabledLooper);
+            mSubsystemManager.registerDisabledLoops(mDisabledLooper);
+
+            mRobotState.reset(Timer.getFPGATimestamp(), RigidTransform2.identity());
+
+            mLimelight.setLed(Limelight.LedMode.OFF);
+
+        } catch (Exception ini) {
+            CrashTracker.logThrowableCrash(ini);
+            throw ini;
+        }
     }
 
     /**
@@ -125,6 +158,22 @@ public class Robot extends TimedRobot {
         // this line or comment it out.
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
+        }
+
+        try {
+            CrashTracker.logTeleopInit();
+            mDisabledLooper.stop();
+
+            mEnabledLooper.start();
+            mLimelight.setLed(Limelight.LedMode.ON);
+            mLimelight.setPipeline(Constants.kPortPipeline);
+            mHood.setNeutralMode(NeutralMode.Brake);
+            mLEDs.conformToState(LEDs.State.ENABLED);
+
+            mControlBoard.reset();
+        } catch (Throwable t) {
+            CrashTracker.logThrowableCrash(t);
+            throw t;
         }
     }
 

@@ -53,7 +53,10 @@ public class Constants {
 	public static final double kDriveTranslationKp = 0.05;
 	public static final double kDriveTranslationKi = 0.0;
 	public static final double kDriveTranslationKd = 0.0;
-	
+
+	// Control Board
+	public static final double kJoystickThreshold = 0.2;
+	public static final int kButtonGamepadPort = 1;
 
 	 // Indexer
 	 public static final int kLowerBeamBreak = 1;      // TODO Find actual port

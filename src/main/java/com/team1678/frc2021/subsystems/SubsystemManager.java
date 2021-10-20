@@ -1,6 +1,7 @@
 package com.team1678.frc2021.subsystems;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.team1678.frc2021.loops.ILooper;
@@ -13,9 +14,7 @@ import com.team1678.frc2021.loops.Looper;
 public class SubsystemManager implements ILooper {
 
     public static SubsystemManager mInstance = null;
-
     private List<Subsystem> mAllSubsystems;
-    public List<Subsystem> getSubsystems(){ return mAllSubsystems; }
 
     private SubsystemManager() {
         // The instance, does nothing
@@ -46,6 +45,15 @@ public class SubsystemManager implements ILooper {
     public void stop() {
         mAllSubsystems.forEach(Subsystem::stop);
     }
+
+    public List<Subsystem> getSubsystems() {
+        return mAllSubsystems;
+    }
+
+    public void setSubsystems(Subsystem... allSubsystems) {
+        mAllSubsystems = Arrays.asList(allSubsystems);
+    }
+
 
     public boolean haveEmergency(){
         boolean emergency = false;
