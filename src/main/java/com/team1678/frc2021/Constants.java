@@ -75,7 +75,7 @@ public class Constants {
 	 public static final int kDistancePerSlot = 360 / kIndexerSlots;		// TODO Find Actual Distance
 	 public static final int kTotalDistance = 5000;                         // TODO Find Actual Distance
 
-	 public static final int kIndexerId = 7;
+	 public static final int kIndexerId = 15;
 
 	 public static final double kZoomingVelocity = 80.;
 

@@ -26,7 +26,6 @@ public class Superstructure extends Subsystem {
     private final Hood mHood = Hood.getInstance();
     private final Indexer mIndexer = Indexer.getInstance();
     private final RobotState mRobotState = RobotState.getInstance();
-    private final Swerve mSwerve = Swerve.getInstance();
 
     private boolean mUseInnerTarget = false;
     private boolean mWantsUnjam = false;
@@ -83,7 +82,7 @@ public class Superstructure extends Subsystem {
         // The superstructure class
     }
 
-    public synchronized Superstructure getInstance(){
+    public synchronized static Superstructure getInstance(){
         if(mInstance == null)
             mInstance = new Superstructure();
         return mInstance;
@@ -227,13 +226,14 @@ public class Superstructure extends Subsystem {
     }
 
     public synchronized void updateCurrentState() {
-        mCurrentAim = getGyroDegrees();
+        //mCurrentAim = getGyroDegrees();
+        mCurrentAim = 0;
         mCurrentHood = mHood.getAngle();
     }
 
-    private double getGyroDegrees() {
-        return mSwerve.getYaw().getDegrees();
-    }
+    //private double getGyroDegrees() {
+    //    return mSwerve.getYaw().getDegrees();
+    //}
 
     public synchronized double getCorrectedRangeToTarget() {
         return mCorrectedRangeToTarget;

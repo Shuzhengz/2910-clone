@@ -3,11 +3,15 @@
 // the WPILib BSD license file in the root directory of this project.
 package com.team1678.frc2021;
 
+import com.team1678.frc2021.subsystems.Hood;
+import com.team1678.frc2021.subsystems.Shooter;
 import com.team1678.frc2021.subsystems.Swerve;
+import com.team1678.frc2021.subsystems.superstructure.Superstructure;
 import com.team2910.lib.robot.UpdateManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -17,6 +21,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   public static CTREConfigs ctreConfigs;
+  public static Superstructure superstructure;
+
+  private final Hood mHood = Hood.getInstance();
+  private final Shooter mShooter = Shooter.getInstance();
+  private final Superstructure mSuperstructure = Superstructure.getInstance();
 
   private Command m_autonomousCommand;
 
@@ -27,6 +36,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+
     ctreConfigs = new CTREConfigs();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
@@ -43,6 +53,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    mHood.outputTelemetry();
+    mShooter.outputTelemetry();
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the 3's periodic
