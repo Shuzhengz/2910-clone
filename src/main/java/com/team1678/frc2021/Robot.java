@@ -182,6 +182,14 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void teleopPeriodic() {
+        try{
+            double timestamp = Timer.getFPGATimestamp();
+            double hood_jog = mControlBoard.getJogHood();
+
+        } catch (Exception t) {
+            CrashTracker.logThrowableCrash(t);
+            throw t;
+        }
     }
 
     @Override
