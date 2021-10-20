@@ -3,8 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 package com.team1678.frc2021;
 
+import com.team1678.frc2021.loops.Looper;
 import com.team1678.frc2021.subsystems.Hood;
 import com.team1678.frc2021.subsystems.Shooter;
+import com.team1678.frc2021.subsystems.SubsystemManager;
 import com.team1678.frc2021.subsystems.Swerve;
 import com.team1678.frc2021.subsystems.superstructure.Superstructure;
 import com.team2910.lib.robot.UpdateManager;
@@ -22,6 +24,11 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 public class Robot extends TimedRobot {
   public static CTREConfigs ctreConfigs;
   public static Superstructure superstructure;
+
+  private final Looper mEnabledLooper = new Looper();
+  private final Looper mDisabledLooper = new Looper();
+
+  private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
   private final Hood mHood = Hood.getInstance();
   private final Shooter mShooter = Shooter.getInstance();

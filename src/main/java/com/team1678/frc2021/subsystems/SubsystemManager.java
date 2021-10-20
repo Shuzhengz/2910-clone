@@ -12,8 +12,22 @@ import com.team1678.frc2021.loops.Looper;
  */
 public class SubsystemManager implements ILooper {
 
-    private final List<Subsystem> mAllSubsystems;
+    public static SubsystemManager mInstance = null;
+
+    private List<Subsystem> mAllSubsystems;
     public List<Subsystem> getSubsystems(){ return mAllSubsystems; }
+
+    private SubsystemManager() {
+        // The instance, does nothing
+    }
+
+    public static SubsystemManager getInstance() {
+        if (mInstance == null) {
+            mInstance = new SubsystemManager();
+        }
+
+        return mInstance;
+    }
 
     private List<Loop> mLoops = new ArrayList<>();
 
@@ -22,15 +36,15 @@ public class SubsystemManager implements ILooper {
     }
 
     public void outputToSmartDashboard() {
-        mAllSubsystems.forEach((s) -> s.outputTelemetry());
+        mAllSubsystems.forEach(Subsystem::outputTelemetry);
     }
 
     public void writeToLog() {
-        mAllSubsystems.forEach((s) -> s.writeToLog());
+        mAllSubsystems.forEach(Subsystem::writeToLog);
     }
 
     public void stop() {
-        mAllSubsystems.forEach((s) -> s.stop());
+        mAllSubsystems.forEach(Subsystem::stop);
     }
 
     public boolean haveEmergency(){
@@ -95,7 +109,7 @@ public class SubsystemManager implements ILooper {
     }
 
     public void registerEnabledLoops(Looper enabledLooper) {
-        mAllSubsystems.forEach((s) -> s.registerEnabledLoops(this));
+        mAllSubsystems.forEach(s -> s.registerEnabledLoops(this));
         enabledLooper.register(new EnabledLoop());
     }
 
