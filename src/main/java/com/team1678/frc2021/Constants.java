@@ -78,7 +78,7 @@ public class Constants {
 
 	 public static final double kZoomingSpeed = 0.8;
 	 public static final double kIndexingSpeed = 0.5;
-	 public static final double kBardingSpeed = -0.8;
+	 public static final double kBarfingSpeed = -0.9;
 
 	// shooter
 	public static final int kMasterFlywheelID = 2;

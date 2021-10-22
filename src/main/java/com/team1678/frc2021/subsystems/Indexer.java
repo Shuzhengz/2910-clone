@@ -12,6 +12,7 @@ import com.team1678.frc2021.loops.Loop;
 import com.team254.lib.drivers.TalonFXFactory;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Indexer extends Subsystem {
@@ -19,7 +20,6 @@ public class Indexer extends Subsystem {
     // Variable Declarations
     private static Indexer mInstance = null;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
-    private double mIndexerStart;
 
     // Slot Proxies
     private final DigitalInput mLowerBeamBreak = new DigitalInput(Constants.kLowerBeamBreak);
@@ -33,8 +33,10 @@ public class Indexer extends Subsystem {
     private int mCurrentSlot;
     private final TalonFX mMaster;
 
-    private boolean mBackwards = false;
     private boolean mIntakeHasBall;
+    private boolean mIntakeCanPass = false;
+    private boolean mIntakeReverse =  false;
+    private boolean mShooterNeedShoot = false;
 
     private State mState = State.IDLE;
 
@@ -156,12 +158,16 @@ public class Indexer extends Subsystem {
     }
 
     /**
-     * Sets the percentage for the open loop
+     * Sets the percentage for the open loop, percent output mode for the indexer
      * @param percentage The Percentage to set the open loop at
      */
     public synchronized void setOpenLoop(double percentage) {
         mPeriodicIO.indexer_control_mode = ControlMode.PercentOutput;
         mPeriodicIO.indexer_demand = percentage;
+    }
+
+    public synchronized boolean getIntakeCanPass() {
+        return mIntakeCanPass;
     }
 
     /**
@@ -222,18 +228,55 @@ public class Indexer extends Subsystem {
         updateSlots();
         switch (mState) {
             case IDLE:
+                mIntakeCanPass = false;
+                mIntakeReverse = false;
+                mShooterNeedShoot = false;
                 spinMotor(0);
                 break;
             case PREPPING:
+                mShooterNeedShoot = false;
+                mIntakeReverse = false;
+                mIntakeCanPass = false;
                 if (slotsEmpty()) {
-                    
+                    spinMotor(Constants.kIndexingSpeed);
+                } else if (!slotsFilled() && mIntakeHasBall) {
+                    spinMotor(Constants.kZoomingSpeed);
+                } else {
+                    boolean atIntake = false;
+                    spinMotor(-Constants.kIndexingSpeed);
+                    while (!atIntake) {
+                        atIntake = mLowerBeamBreak.get();
+                    }
+                    spinMotor(0);
+                    mState = State.FEEDING;
                 }
                 break;
             case ZOOMING:
+                mShooterNeedShoot = false;
+                mIntakeReverse = false;
+                if (slotsEmpty()) {
+                    spinMotor(Constants.kZoomingSpeed);
+                    mShooterNeedShoot = true;
+                    mIntakeCanPass = true;
+                } else if (slotsEmpty() && mIntakeHasBall) {
+                    spinMotor(Constants.kZoomingSpeed);
+                    try { Thread.sleep(100); }
+                    catch (InterruptedException ex) { Thread.currentThread().interrupt(); }
+                    mShooterNeedShoot = true;
+                    mIntakeCanPass = true;
+                } else {
+                    mShooterNeedShoot = true;
+                    mIntakeCanPass = true;
+                    spinMotor(Constants.kZoomingSpeed);
+                }
                 break;
             case BARFING:
+                spinMotor(Constants.kBarfingSpeed);
+                mIntakeReverse = true;
+                mShooterNeedShoot = false;
                 break;
             case FEEDING:
+                //TODO complete
                 break;
         }
     }
@@ -278,6 +321,7 @@ public class Indexer extends Subsystem {
         SmartDashboard.putNumber("IndexerDemand", mPeriodicIO.indexer_demand);
         SmartDashboard.putNumber("IndexerVelocity", mPeriodicIO.indexer_velocity);
 
+        SmartDashboard.putNumber("BallsInIndexer", mBallCount);
         SmartDashboard.putBoolean("LowerBeamBreak", mPeriodicIO.beamBreakSensor[0]);
         SmartDashboard.putBoolean("UpperBeamBreak", mPeriodicIO.beamBreakSensor[1]);
         SmartDashboard.putBoolean("Snapped", mPeriodicIO.snapped);
