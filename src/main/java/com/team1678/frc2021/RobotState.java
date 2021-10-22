@@ -25,7 +25,6 @@ public class RobotState {
         if (mInstance == null) {
             mInstance = new RobotState();
         }
-
         return mInstance;
     }
 

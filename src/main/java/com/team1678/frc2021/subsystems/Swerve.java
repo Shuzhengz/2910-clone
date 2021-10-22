@@ -30,6 +30,8 @@ public class Swerve extends SubsystemBase {
     private double lastSnapInput;
     
     private final Object sensorLock = new Object();
+    private static final Object sensorLockStatic = new Object();
+
     @GuardedBy("sensorLock")
 
     public static Swerve getInstance() {

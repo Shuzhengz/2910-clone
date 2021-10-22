@@ -11,8 +11,6 @@ import com.team1678.frc2021.Constants;
 import com.team1678.frc2021.loops.ILooper;
 import com.team1678.frc2021.loops.Loop;
 import com.team254.lib.drivers.TalonFXFactory;
-import com.team1678.frc2021.planners.IndexerMotionPlanner;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,7 +19,6 @@ public class Indexer extends Subsystem {
 
     // Variable Declarations
     private static Indexer mInstance = null;
-    private IndexerMotionPlanner mMotionPlanner;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private double mIndexerStart;
 
@@ -82,9 +79,6 @@ public class Indexer extends Subsystem {
 
         mMaster.setSelectedSensorPosition(0, 0, Constants.kLongCANTimeoutMs);
         mMaster.configClosedloopRamp(0.0);
-
-        // Initiate new Indexer Motion Planner
-        mMotionPlanner = new IndexerMotionPlanner();
     }
 
     /**
@@ -102,7 +96,8 @@ public class Indexer extends Subsystem {
             //Indexing, pushing balls to the shooter
             case INDEXING:
                 mPeriodicIO.indexer_control_mode = ControlMode.MotionMagic;
-                double distanceToSlot = mMotionPlanner.findDistanceGoal(findFurthestFilledSlot());
+                //double distanceToSlot = mMotionPlanner.findDistanceGoal(findFurthestFilledSlot());
+                double distanceToSlot = 0;
                 mPeriodicIO.indexer_demand = distanceToSlot;
                 break;
             // Backwards in case of jamming
@@ -113,7 +108,8 @@ public class Indexer extends Subsystem {
             // Prepping the indexer for intake to intake
             case PREPPING:
                 mPeriodicIO.indexer_control_mode = ControlMode.MotionMagic;
-                double prepDistance = mMotionPlanner.findPrepDistance(findNearestFilledSlot());
+                //double prepDistance = mMotionPlanner.findPrepDistance(findNearestFilledSlot());
+                double prepDistance = 0;
                 if (slotsEmpty()) {
                     mPeriodicIO.clearForIntake = true;
                 } else if (prepDistance == 0) {
@@ -125,16 +121,15 @@ public class Indexer extends Subsystem {
             // Feeding the shooter
             case FEEDING:
                 mPeriodicIO.indexer_control_mode = ControlMode.MotionMagic;
-                if (mMotionPlanner.isAtGoal(mCleanSlots)) {
-                    if (!mStartCounting) {
-                        mInitialTime = now;
-                        mStartCounting = true;
-                    }
-                    if (mStartCounting && now - mInitialTime > mWaitTime) {
-                        mStartCounting = false;
-                    }
+                if (!mStartCounting) {
+                    mInitialTime = now;
+                    mStartCounting = true;
                 }
-                mPeriodicIO.indexer_demand = IndexerMotionPlanner.findDistanceGoal(findNearestFilledSlot());
+                if (mStartCounting && now - mInitialTime > mWaitTime) {
+                    mStartCounting = false;
+                }
+                //mPeriodicIO.indexer_demand = IndexerMotionPlanner.findDistanceGoal(findNearestFilledSlot());
+                mPeriodicIO.indexer_demand = 0;
                 break;
             // Indexer slow running, for when the intake is running at slow speed
             case SLOW_ZOOMING:
@@ -307,7 +302,7 @@ public class Indexer extends Subsystem {
      * @param indexer_angle Angle of the indexer
      */
     private void updateSlots(double indexer_angle) {
-        mCleanSlots = mMotionPlanner.updateSlotStatus(mPeriodicIO.raw_slots);
+        mCleanSlots = mPeriodicIO.raw_slots;
     }
 
     /**
@@ -353,7 +348,7 @@ public class Indexer extends Subsystem {
         enabledLooper.register(new Loop() {
             @Override
             public void onStart(double timestamp) {
-                mState = State.IDLE;
+                mState = State.INDEXING;
             }
 
             @Override
