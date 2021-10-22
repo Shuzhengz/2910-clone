@@ -73,17 +73,12 @@ public class Constants {
 	 public static final double kIndexerVelocityKf = .05;
 	 public static final int kIndexerMaxVelocity = 20000; // ticks / 100ms, TODO test for actual value
 	 public static final int kIndexerMaxAcceleration = 40000; // ticks / 100ms / sec, TODO test for actual value
- 
-	 public static final int kIndexerSlots = 5;
-	 public static final int kDistancePerSlot = 360 / kIndexerSlots;		// TODO Find Actual Distance
-	 public static final int kTotalDistance = 5000;                         // TODO Find Actual Distance
 
 	 public static final int kIndexerId = 15;
 
-	 public static final double kZoomingVelocity = 80.;
-
-	 public static final boolean[] kFullSlots = {true, true, true };
-	 public static final boolean[] kEmptySlots = {false, false, false };
+	 public static final double kZoomingSpeed = 0.8;
+	 public static final double kIndexingSpeed = 0.5;
+	 public static final double kBardingSpeed = -0.8;
 
 	// shooter
 	public static final int kMasterFlywheelID = 2;

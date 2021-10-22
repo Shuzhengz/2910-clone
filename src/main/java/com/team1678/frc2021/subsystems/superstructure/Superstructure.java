@@ -401,26 +401,22 @@ public class Superstructure extends Subsystem {
             mHood.setSetpointMotionMagic(mHoodSetpoint);
         }
 
-        Indexer.WantedAction indexerAction = Indexer.WantedAction.PREP;
-        double real_trigger = 0.0;
+        Indexer.spinMotor();
         double real_shooter = 0.0;
         boolean real_popout = false;
 
         if (Intake.getInstance().getState() == Intake.State.INTAKING) {
             mIndexShouldSpin = true;
             indexerAction = Indexer.WantedAction.PREP;
-            real_trigger = -600.0;
         }
 
         if (mWantsSpinUp) {
             real_shooter = mShooterSetpoint;
             indexerAction = Indexer.WantedAction.PREP;
-            real_trigger = -600.0;
             enableIndexer(true);
         } else if (mWantsPreShot) {
             real_shooter = mShooterSetpoint;
             indexerAction = Indexer.WantedAction.HELLA_ZOOM;
-            real_trigger = Constants.kTriggerRPM;
             real_popout = false;
         } else if (mWantsShoot) {
             real_shooter = mShooterSetpoint;
@@ -434,7 +430,6 @@ public class Superstructure extends Subsystem {
             } else {
                 indexerAction = Indexer.WantedAction.INDEX;
             }
-            real_trigger = Constants.kTriggerRPM;
 
             if (mGotSpunUp) {
                 real_popout = true;
@@ -447,7 +442,6 @@ public class Superstructure extends Subsystem {
         } else if(mWantsTestSpit){
             real_shooter = 1200;
             indexerAction = Indexer.WantedAction.SLOW_ZOOM;
-            real_trigger = 4000.0;
             real_popout = true;
             enableIndexer(true);
         }
@@ -456,7 +450,6 @@ public class Superstructure extends Subsystem {
         if (mWantsUnjam) {
             indexerAction = Indexer.WantedAction.PREP;
             real_popout = true;
-            real_trigger = -5000;
         }
 
         if (mEnableIndexer && mIndexShouldSpin) {

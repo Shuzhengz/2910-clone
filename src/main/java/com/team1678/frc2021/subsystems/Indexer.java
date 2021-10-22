@@ -28,11 +28,23 @@ public class Indexer extends Subsystem {
     // Slot state arrays
     private boolean mSlotsClean;
 
+    private int mBallCount = 0;
+
     private int mCurrentSlot;
     private final TalonFX mMaster;
 
     private boolean mBackwards = false;
     private boolean mIntakeHasBall;
+
+    private State mState = State.IDLE;
+
+    public enum WantedAction {
+        NONE, PREP, ZOOM, BARF, FEED,
+    }
+
+    public enum State {
+        IDLE, PREPPING, ZOOMING, BARFING, FEEDING,
+    }
 
     /**
      * The Indexer Utility Class
@@ -68,7 +80,7 @@ public class Indexer extends Subsystem {
      * Returns the Indexer velocity
      * @return Indexer velocity
      */
-    public double getIndexerVelocity() {
+    public double getIndexerDemand() {
         double rValue = 0;
         try {
             if (mPeriodicIO.indexer_control_mode == ControlMode.PercentOutput) {
@@ -84,7 +96,7 @@ public class Indexer extends Subsystem {
      * Spins the motor, in the percentage output control mode
      * @param speed the speed you want to spin it at
      */
-    public void spinMotor(double speed){
+    private void spinMotor(double speed) {
         mPeriodicIO.indexer_demand = speed;
     }
 
@@ -127,26 +139,12 @@ public class Indexer extends Subsystem {
     }
 
     /**
-     * Sets the Indexer output to the Smart Dashboard on the Driverstation
-     */
-    @Override
-    public void outputTelemetry() {
-        SmartDashboard.putString("IndexerControlMode", mPeriodicIO.indexer_control_mode.name());
-        SmartDashboard.putNumber("IndexerDemand", mPeriodicIO.indexer_demand);
-        SmartDashboard.putNumber("IndexerVelocity", mPeriodicIO.indexer_velocity);
-
-        SmartDashboard.putBoolean("LowerBeamBreak", mPeriodicIO.beamBreakSensor[0]);
-        SmartDashboard.putBoolean("UpperBeamBreak", mPeriodicIO.beamBreakSensor[1]);
-        SmartDashboard.putBoolean("Snapped", mPeriodicIO.snapped);
-    }
-
-    /**
      * Updates the slot status
-     * @param indexer_angle Angle of the indexer
      */
-    private void updateSlots(double indexer_angle) {
+    private void updateSlots() {
         mIntakeHasBall = mPeriodicIO.beamBreakSensor[0];
         mSlotsClean = mPeriodicIO.beamBreakSensor[1];
+        if (mBallCount != 0) { mSlotsClean = false; }
     }
 
     /**
@@ -172,6 +170,7 @@ public class Indexer extends Subsystem {
     @Override
     public void stop() {
         setOpenLoop(0);
+        mMaster.set(ControlMode.PercentOutput, 0);
     }
 
     /**
@@ -200,21 +199,63 @@ public class Indexer extends Subsystem {
         enabledLooper.register(new Loop() {
             @Override
             public void onStart(double timestamp) {
-                // Things to do on start
+                mState = State.IDLE;
             }
 
             @Override
             public void onLoop(double timestamp) {
                 synchronized (Indexer.this) {
-                    // Things to do while in loop
+                    runStateMachine();
                 }
             }
 
             @Override
             public void onStop(double timestamp) {
                 // Things to do on stop
+                mState = State.IDLE;
+                stop();
             }
         });
+    }
+
+    public void runStateMachine() {
+        updateSlots();
+        switch (mState) {
+            case IDLE:
+                spinMotor(0);
+                break;
+            case PREPPING:
+                if (slotsEmpty()) {
+                    
+                }
+                break;
+            case ZOOMING:
+                break;
+            case BARFING:
+                break;
+            case FEEDING:
+                break;
+        }
+    }
+
+    public void setState(WantedAction wanted_state) {
+        switch (wanted_state) {
+            case NONE:
+                mState = State.IDLE;
+                break;
+            case PREP:
+                mState = State.PREPPING;
+                break;
+            case ZOOM:
+                mState = State.ZOOMING;
+                break;
+            case BARF:
+                mState = State.BARFING;
+                break;
+            case FEED:
+                mState = State.FEEDING;
+                break;
+        }
     }
 
     /**
@@ -226,6 +267,20 @@ public class Indexer extends Subsystem {
         mPeriodicIO.beamBreakSensor[0] = mLowerBeamBreak.get();  // Slot closest to the shooter
         mPeriodicIO.beamBreakSensor[1] = mUpperBeamBreak.get();
         mPeriodicIO.indexer_current = mMaster.getStatorCurrent();
+    }
+
+    /**
+     * Sets the Indexer output to the Smart Dashboard on the Driverstation
+     */
+    @Override
+    public void outputTelemetry() {
+        SmartDashboard.putString("IndexerControlMode", mPeriodicIO.indexer_control_mode.name());
+        SmartDashboard.putNumber("IndexerDemand", mPeriodicIO.indexer_demand);
+        SmartDashboard.putNumber("IndexerVelocity", mPeriodicIO.indexer_velocity);
+
+        SmartDashboard.putBoolean("LowerBeamBreak", mPeriodicIO.beamBreakSensor[0]);
+        SmartDashboard.putBoolean("UpperBeamBreak", mPeriodicIO.beamBreakSensor[1]);
+        SmartDashboard.putBoolean("Snapped", mPeriodicIO.snapped);
     }
 
     /**
