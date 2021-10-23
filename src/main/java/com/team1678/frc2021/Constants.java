@@ -82,18 +82,12 @@ public class Constants {
 
 	// shooter
 	public static final int kMasterFlywheelID = 2;
-	public static final int kSlaveFlywheelID = 15;
+	public static final int kSlaveFlywheelID = 1;
 	public static final int kOverheadFlywheelID = 16;
 	public static final double kShooterP = 0.2;
 	public static final double kShooterI = 0.00004;
 	public static final double kShooterD = 0.0;
 	public static final double kShooterF = 0.05;
-	public static final double kTriggerP = 0.05;
-	public static final double kTriggerI = 0.0;
-	public static final double kTriggerD = 0.0;
-	public static final double kTriggerF = 0.05;
-
-	public static final double kTriggerRPM = 5000.0;
 
 	// hood
 	public static final ServoMotorSubsystem.ServoMotorSubsystemConstants kHoodConstants = new ServoMotorSubsystem.ServoMotorSubsystemConstants();
