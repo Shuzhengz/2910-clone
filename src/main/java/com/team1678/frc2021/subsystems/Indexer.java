@@ -277,6 +277,14 @@ public class Indexer extends Subsystem {
                 break;
             case FEEDING:
                 //TODO complete
+                mIntakeReverse = false;
+                mIntakeCanPass = true;
+                mShooterNeedShoot = false;
+                if (mBallCount == 3) {
+                    System.out.println("Indexer full");
+                } else if (mBallCount < 3 && mBallCount > 0) {
+                    spinMotor(Constants.kIndexingSpeed);
+                }
                 break;
         }
     }
