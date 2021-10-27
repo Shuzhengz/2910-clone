@@ -4,6 +4,7 @@
 package com.team1678.frc2021;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.team1678.frc2021.auto.AutoModeBase;
 import com.team1678.frc2021.loops.Looper;
 import com.team1678.frc2021.subsystems.*;
 import com.team1678.frc2021.subsystems.superstructure.Superstructure;
@@ -14,12 +15,15 @@ import com.team254.lib.util.CrashTracker;
 import com.team2910.lib.math.RigidTransform2;
 import com.team2910.lib.robot.UpdateManager;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+
+import java.util.Optional;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -122,10 +126,41 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void disabledInit() {
+        mEnabledLooper.stop();
+
+        Swerve.getInstance().zeroGyro();
+        RobotState.getInstance().reset(Timer.getFPGATimestamp(), RigidTransform2.identity());
+
+        mDisabledLooper.start();
+        //mHood.setNeutralMode(NeutralMode.Coast);
+        mLimelight.writePeriodicOutputs();
+        mLEDs.conformToState(LEDs.State.RAINBOW);
     }
 
     @Override
     public void disabledPeriodic() {
+        SmartDashboard.putString("Match Cycle", "DISABLED");
+
+        // mLimelight.setStream(2);
+
+        try {
+            mLimelight.setLed(Limelight.LedMode.OFF);
+            mLimelight.writePeriodicOutputs();
+
+            if (!mLimelight.limelightOK()) {
+                mLEDs.conformToState(LEDs.State.EMERGENCY);
+            } else if (mHood.isHoming()) {
+                mLEDs.conformToState(LEDs.State.RAINBOW);
+            } else {
+                mLEDs.conformToState(LEDs.State.BREATHING_PINK);
+            }
+
+            mLEDs.writePeriodicOutputs();
+
+        } catch (Exception t) {
+            CrashTracker.logThrowableCrash(t);
+            throw t;
+        }
     }
 
     /**
@@ -148,6 +183,21 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousPeriodic() {
+        SmartDashboard.putString("Match Cycle", "AUTONOMOUS");
+        //mLimelight.setLed(Limelight.LedMode.ON);
+
+        if (!mLimelight.limelightOK()) {
+            mLEDs.conformToState(LEDs.State.EMERGENCY);
+        } else {
+            mLEDs.conformToState(LEDs.State.ENABLED);
+        }
+
+        try {
+
+        } catch (Exception t) {
+            CrashTracker.logThrowableCrash(t);
+            throw t;
+        }
     }
 
     @Override
@@ -171,6 +221,7 @@ public class Robot extends TimedRobot {
             mLEDs.conformToState(LEDs.State.ENABLED);
 
             mControlBoard.reset();
+
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -182,6 +233,13 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void teleopPeriodic() {
+
+        if (!mLimelight.limelightOK()) {
+            mLEDs.conformToState(LEDs.State.EMERGENCY);
+        } else {
+            mLEDs.conformToState(LEDs.State.ENABLED);
+        }
+
         try{
             double timestamp = Timer.getFPGATimestamp();
             double hood_jog = mControlBoard.getJogHood();
