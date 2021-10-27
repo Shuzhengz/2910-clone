@@ -401,7 +401,7 @@ public class Superstructure extends Subsystem {
             mHood.setSetpointMotionMagic(mHoodSetpoint);
         }
 
-        Indexer.spinMotor();
+        Indexer.WantedAction indexerAction = Indexer.WantedAction.NONE;
         double real_shooter = 0.0;
         boolean real_popout = false;
 
@@ -414,41 +414,10 @@ public class Superstructure extends Subsystem {
             real_shooter = mShooterSetpoint;
             indexerAction = Indexer.WantedAction.PREP;
             enableIndexer(true);
-        } else if (mWantsPreShot) {
-            real_shooter = mShooterSetpoint;
-            indexerAction = Indexer.WantedAction.HELLA_ZOOM;
-            real_popout = false;
-        } else if (mWantsShoot) {
-            real_shooter = mShooterSetpoint;
-
-            if (mLatestAimingParameters.isPresent()) {
-                if (mLatestAimingParameters.get().getRange() > 240.) {
-                    indexerAction = Indexer.WantedAction.SLOW_ZOOM;
-                } else {
-                    indexerAction = Indexer.WantedAction.INDEX;
-                }
-            } else {
-                indexerAction = Indexer.WantedAction.INDEX;
-            }
-
-            if (mGotSpunUp) {
-                real_popout = true;
-                enableIndexer(true);
-            }
-
-            if (mShooter.spunUp()) {
-                mGotSpunUp = true;
-            }
-        } else if(mWantsTestSpit){
-            real_shooter = 1200;
-            indexerAction = Indexer.WantedAction.SLOW_ZOOM;
-            real_popout = true;
-            enableIndexer(true);
         }
 
-
         if (mWantsUnjam) {
-            indexerAction = Indexer.WantedAction.PREP;
+            indexerAction = Indexer.WantedAction.BARF;
             real_popout = true;
         }
 
@@ -486,10 +455,10 @@ public class Superstructure extends Subsystem {
             Limelight.getInstance().setPipeline(Limelight.kDefaultPipeline);
         }
 
-//        Limelight.getInstance().setPipeline(Limelight.kDefaultPipeline);
+        //Limelight.getInstance().setPipeline(Limelight.kDefaultPipeline);
 
         if (mAimingMode == AimingControlModes.OPEN_LOOP || !mEnableIndexer) {
-            // Noting happnes, hull aimed
+            // Noting happnes here for now, hull aimed
         } else {
             mTurnAimSetpoint = mAimSetpoint;
         }
