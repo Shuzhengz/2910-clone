@@ -1,0 +1,189 @@
+# you can select segments of this using
+#    -y THISFILE -Y [list of plot names]
+# eg:
+#    -y 2020.yml -Y velocity, distance, currents
+
+plots:
+  test:
+    - x: localtime
+      y: Robot X
+
+  position:
+    - x: Robot X
+      y: Robot Y
+      fixedAspect: true
+
+  map:
+    - x: Robot X
+      y: Robot Y
+
+      # xoff: 0
+      # yoff: 0
+      xoff: 120
+      yoff: 93
+      # yoff: -140  from their middle, which is left edge and middle
+      # their offset is 140, -140
+      # vertical
+      #yoff: # 319/2 -140
+      #yoff: 59.5
+      fixedAspect: true
+
+    - data_source: svg
+      file: 2020map.svg
+      y: test
+      x: bogus
+
+      xmax: 629.25
+      ymax: 323.25
+      # xmax: 649
+      # ymax: 319
+      alpha: .3
+
+  mapfull:
+    - x: Robot X
+      y: Robot Y
+      fixedAspect: true
+
+
+      xmin: 0
+      ymin: 0
+      xmax: 629.25
+      ymax: 323.25
+
+      xoff: 0
+      yoff: 160 # 323/2 # 323/2-140
+
+    - data_source: svg
+      file: 2020map.svg
+      y: test
+      x: bogus
+      xmax: 649
+      ymax: 319
+      alpha: .3
+
+
+  mapfulltimed:
+    - x: Robot X
+      y: Robot Y
+      fixedAspect: true
+
+
+      xmin: 0
+      ymin: 0
+      xmax: 629.25
+      ymax: 323.25
+
+      xoff: 0
+      yoff: 161.5 # 323/2
+
+    - data_source: svg
+      file: 2020map.svg
+      y: test
+      x: bogus
+      xmax: 649
+      ymax: 319
+      alpha: .3
+
+    - data_source: timer
+      marker_size: 20
+      x: Robot X
+      y: Robot Y
+      delta: 1
+
+      xoff: 0
+      yoff: 161.5 # 323/2
+
+  justmap:
+    - data_source: svg
+      file: 2020mapfull.svg
+      y: test
+      x: bogus
+
+      xmax: 629.25
+      ymax: 323.25
+      # xmax: 649
+      # ymax: 319
+      alpha: .3
+
+  velocity:
+    - x: localtime
+      y:
+        - Left Linear Velocity
+        - Right Linear Velocity
+        - Robot Velocity
+
+  distance:
+    - x: localtime
+      y:
+        - Left Drive Distance
+        - Right Drive Distance
+
+  heading:
+    - x: localtime
+      y:
+        - Gyro Heading
+        - IndexerAngle
+      
+  currents:
+    - x: localtime
+      y:
+        - Trigger Current
+        - Flywheel Current
+        - Intake Current
+  slots:
+    - x: localtime
+      y:
+        - DirtySlots
+        - CleanSlots
+
+  goals:
+    - x: localtime
+      y:
+        - Flywheel Goal
+        - Trigger Goal
+
+  flywheel:
+    - x: localtime
+      y:
+        - Flywheel Velocity
+#        - Flywheel Goal
+
+  trigger:
+    - x: localtime
+      y:
+        - Trigger Goal
+        - Trigger Velocity
+
+  
+  turret:
+    - x: localtime
+      y:
+        - Turret Goal
+
+  angles:
+    - x: localtime
+      y:
+        - IndexerAngle
+        - Vehicle to TargetAngle
+        - Hood Angle
+  encoders:
+    - x: localtime
+      y: 
+        - Mod 1 Cancoder
+        - Mod 2 Cancoder
+        - Mod 3 Cancoder
+        - Mod 4 Cancoder
+  indexer:
+    - x: localtime
+      y:
+        - IndexerControlMode
+        - IndexerVelocity
+        - IndexerOffset
+        - IndexerSetpoint
+  hood:
+    - x: localtime
+      y:
+        - Hood Goal
+        - Hood Angle
+        
+  
