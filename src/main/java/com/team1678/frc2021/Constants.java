@@ -59,8 +59,8 @@ public class Constants {
 	public static final int kButtonGamepadPort = 1;
 
 	 // Indexer
-	 public static final int kLowerBeamBreak = 1;      // TODO Find actual port
-	 public static final int kUpperBeamBreak = 2;      // TODO Find actual port
+	 public static final int kLowerBeamBreak = 1;
+	 public static final int kUpperBeamBreak = 0;
 	 public static final int kIndexerLimitSwitch = 6;
  
 	 public static final double kIndexerKp = 0.2;
