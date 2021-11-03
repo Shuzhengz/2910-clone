@@ -11,6 +11,7 @@ import com.team1678.frc2021.subsystems.superstructure.Superstructure;
 import com.team1678.frc2021.controlboard.ControlBoard;
 
 import com.team254.lib.geometry.Pose2d;
+import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.CrashTracker;
 import com.team2910.lib.math.RigidTransform2;
 import com.team2910.lib.robot.UpdateManager;
@@ -234,15 +235,28 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
 
-        if (!mLimelight.limelightOK()) {
-            mLEDs.conformToState(LEDs.State.EMERGENCY);
-        } else {
-            mLEDs.conformToState(LEDs.State.ENABLED);
-        }
-
         try{
             double timestamp = Timer.getFPGATimestamp();
             double hood_jog = mControlBoard.getJogHood();
+
+            if (!mLimelight.limelightOK()) {
+                mLEDs.conformToState(LEDs.State.EMERGENCY);
+            } else {
+                mLEDs.conformToState(LEDs.State.ENABLED);
+            }
+
+            mSuperstructure.enableIndexer(true);
+
+            // TODO link to the buttons, manual zoom is indexer in god mode
+            //mSuperstructure.setWantUnjam();
+            //mSuperstructure.setManualZoom();
+
+            mControlBoard.setRumble(mSuperstructure.getWantShoot());
+            mSuperstructure.setWantHoodScan(mControlBoard.getWantHoodScan());
+
+            mSuperstructure.setWantAutoAim();
+
+
 
         } catch (Exception t) {
             CrashTracker.logThrowableCrash(t);

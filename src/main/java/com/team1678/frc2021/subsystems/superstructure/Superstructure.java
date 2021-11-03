@@ -9,6 +9,7 @@ import com.team1678.lib.util.InterpolatingDouble;
 import com.team1678.lib.vision.AimingParameters;
 import com.team1678.lib.util.UnitConversion;
 import com.team1678.lib.util.Util;
+import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Twist2d;
 import com.team2910.lib.math.RigidTransform2;
 import com.team2910.lib.math.Rotation2;
@@ -27,6 +28,7 @@ public class Superstructure extends Subsystem {
     private final Hood mHood = Hood.getInstance();
     private final Indexer mIndexer = Indexer.getInstance();
     private final RobotState mRobotState = RobotState.getInstance();
+    private final Intake mIntake = Intake.getInstance();
 
     private boolean mUseInnerTarget = false;
     private boolean mWantsUnjam = false;
@@ -378,10 +380,31 @@ public class Superstructure extends Subsystem {
         safetyReset();
     }
 
+    // Sets if wants auto aim
+    public synchronized void setWantAutoAim() {
+        setWantAutoAim(Rotation2.fromDegrees(180.0), false, 500);
+    }
+
+    public synchronized void setWantAutoAim(Rotation2 field_to_aim_hint, boolean enforce_min_distance,
+                                            double min_distance) {
+        mAimingMode = AimingControlModes.VISION_AIMED;
+        mFieldRelativeAimingGoal = field_to_aim_hint;
+        mEnforceAutoAimMinDistance = enforce_min_distance;
+        mAutoAimMinDistance = min_distance;
+    }
+
     // Aim like a God
     public synchronized void setAimOpenLoop(double throttle) {
         mAimingMode = AimingControlModes.OPEN_LOOP;
         mAimingThrottle = throttle;
+    }
+
+    public synchronized void setWantUnjam(boolean unjam) {
+        mWantsUnjam = unjam;
+    }
+
+    public synchronized void setManualZoom(boolean zoom) {
+        mManualZoom = zoom;
     }
 
     synchronized void followSetpoint() {
@@ -403,8 +426,9 @@ public class Superstructure extends Subsystem {
         }
 
         Indexer.WantedAction indexerAction = Indexer.WantedAction.NONE;
+        Intake.WantedAction intakeAction = Intake.WantedAction.NONE;
+
         double real_shooter = 0.0;
-        boolean real_popout = false;
 
         if (Intake.getInstance().getState() == Intake.State.INTAKING) {
             mIndexShouldSpin = true;
@@ -419,11 +443,12 @@ public class Superstructure extends Subsystem {
 
         if (mWantsUnjam) {
             indexerAction = Indexer.WantedAction.BARF;
-            real_popout = true;
+            intakeAction = Intake.WantedAction.BARF;
         }
 
         if (mEnableIndexer && mIndexShouldSpin) {
             mIndexer.setState(indexerAction);
+            mIntake.setState(intakeAction);
         } else {
             mIndexer.setState(Indexer.WantedAction.PREP);
         }

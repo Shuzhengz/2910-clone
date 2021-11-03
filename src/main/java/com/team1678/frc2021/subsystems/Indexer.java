@@ -41,11 +41,11 @@ public class Indexer extends Subsystem {
     private State mState = State.IDLE;
 
     public enum WantedAction {
-        NONE, PREP, ZOOM, BARF, FEED,
+        NONE, PREP, ZOOM, BARF, FEED, PASS_THROUGH,
     }
 
     public enum State {
-        IDLE, PREPPING, ZOOMING, BARFING, FEEDING,
+        IDLE, PREPPING, ZOOMING, BARFING, FEEDING, PASSING_THROUGH,
     }
 
     /**
@@ -286,6 +286,11 @@ public class Indexer extends Subsystem {
                     spinMotor(Constants.kIndexingSpeed);
                 }
                 break;
+            case PASSING_THROUGH:
+                mIntakeReverse = false;
+                mIntakeCanPass = true;
+                mShooterNeedShoot = true;
+                spinMotor(Constants.kIndexingSpeed);
         }
     }
 
@@ -305,6 +310,9 @@ public class Indexer extends Subsystem {
                 break;
             case FEED:
                 mState = State.FEEDING;
+                break;
+            case PASS_THROUGH:
+                mState = State.PASSING_THROUGH;
                 break;
         }
     }
