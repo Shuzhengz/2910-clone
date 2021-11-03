@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
 
     private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
-    private final Hood mHood = Hood.getInstance();
+    //private final Hood mHood = Hood.getInstance();
     private final Shooter mShooter = Shooter.getInstance();
     private final Superstructure mSuperstructure = Superstructure.getInstance();
     private final Limelight mLimelight = Limelight.getInstance();
@@ -100,7 +100,7 @@ public class Robot extends TimedRobot {
 
             mSubsystemManager.setSubsystems(
                     mLEDs,
-                    mHood,
+                    //mHood,
                     mIntake,
                     mShooter,
                     mCanifier,
@@ -149,8 +149,8 @@ public class Robot extends TimedRobot {
 
             if (!mLimelight.limelightOK()) {
                 mLEDs.conformToState(LEDs.State.EMERGENCY);
-            } else if (mHood.isHoming()) {
-                mLEDs.conformToState(LEDs.State.RAINBOW);
+            //} else if (mHood.isHoming()) {
+            //    mLEDs.conformToState(LEDs.State.RAINBOW);
             } else {
                 mLEDs.conformToState(LEDs.State.BREATHING_PINK);
             }
@@ -217,7 +217,7 @@ public class Robot extends TimedRobot {
             mEnabledLooper.start();
             mLimelight.setLed(Limelight.LedMode.ON);
             mLimelight.setPipeline(Constants.kPortPipeline);
-            mHood.setNeutralMode(NeutralMode.Brake);
+            //mHood.setNeutralMode(NeutralMode.Brake);
             mLEDs.conformToState(LEDs.State.ENABLED);
 
             mControlBoard.reset();
