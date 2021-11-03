@@ -15,6 +15,7 @@ import com.team254.lib.motion.SetpointGenerator;
 import com.team254.lib.motion.SetpointGenerator.Setpoint;
 import com.team254.lib.util.Util;
 
+import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
  * Abstract base class for a subsystem with a single sensored servo-mechanism.
  */
 public abstract class ServoMotorSubsystem extends Subsystem {
+    private AnalogEncoder mEncoder;
+
     private static final int kMotionProfileSlot = 0;
     private static final int kPositionPIDSlot = 1;
 
@@ -75,8 +78,8 @@ public abstract class ServoMotorSubsystem extends Subsystem {
         public int kStastusFrame8UpdateRate = 1000;
         public boolean kRecoverPositionOnReset = false;
 
-        public int kAbsoluteEncoderID = 3;
-
+        public int kAbsoluteEncoderID;
+        public double kAbsoluteEncoderZeroReading;
     }
 
     protected final ServoMotorSubsystemConstants mConstants;
@@ -95,6 +98,7 @@ public abstract class ServoMotorSubsystem extends Subsystem {
         mSlaves = new TalonFX[mConstants.kSlaveConstants.length];
         mMaster.configStatorCurrentLimit(STATOR_CURRENT_LIMIT);
         mMaster.configSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT);
+        mEncoder = new AnalogEncoder(Constants.kHoodConstants.kAbsoluteEncoderID);
 
         TalonUtil.checkError(mMaster.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0,
                 Constants.kLongCANTimeoutMs), mConstants.kName + ": Could not detect encoder: ");
@@ -518,7 +522,7 @@ public abstract class ServoMotorSubsystem extends Subsystem {
     }
 
     public boolean atHomingLocation() {
-        return false;
+        return mEncoder.getPositionOffset() == mConstants.kAbsoluteEncoderZeroReading;
     }
 
     public synchronized void resetIfAtLimit() {

@@ -130,6 +130,7 @@ public class Constants {
 		kHoodConstants.kMaxVoltage = 6;
 
 		kHoodConstants.kAbsoluteEncoderID = 3;
+		kHoodConstants.kAbsoluteEncoderZeroReading = 1.0; // TODO, get actual
 	}
 
 	// limelight

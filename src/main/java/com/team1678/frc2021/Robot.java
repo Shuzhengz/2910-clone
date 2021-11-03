@@ -250,13 +250,14 @@ public class Robot extends TimedRobot {
             // TODO link to the buttons, manual zoom is indexer in god mode
             //mSuperstructure.setWantUnjam();
             //mSuperstructure.setManualZoom();
+            //mSuperstructure.setmWantsPassthrough();
 
             mControlBoard.setRumble(mSuperstructure.getWantShoot());
             mSuperstructure.setWantHoodScan(mControlBoard.getWantHoodScan());
 
             mSuperstructure.setWantAutoAim();
 
-
+            mIntake.setState(Intake.WantedAction.NONE);
 
         } catch (Exception t) {
             CrashTracker.logThrowableCrash(t);

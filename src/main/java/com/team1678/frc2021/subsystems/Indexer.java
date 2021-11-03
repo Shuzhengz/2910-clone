@@ -170,6 +170,14 @@ public class Indexer extends Subsystem {
         return mIntakeCanPass;
     }
 
+    public synchronized boolean getIntakeReverse() {
+        return mIntakeReverse;
+    }
+
+    public synchronized boolean getShooterNeedsShoot() {
+        return mShooterNeedShoot;
+    }
+
     /**
      * Stops the open loop
      */

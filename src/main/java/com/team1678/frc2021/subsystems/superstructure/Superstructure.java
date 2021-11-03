@@ -32,6 +32,7 @@ public class Superstructure extends Subsystem {
 
     private boolean mUseInnerTarget = false;
     private boolean mWantsUnjam = false;
+    private boolean mWantsPassthrough = false;
     private boolean mWantsHoodScan = false;
     private boolean mEnforceAutoAimMinDistance = false;
     private boolean mIndexShouldSpin = false;
@@ -407,6 +408,10 @@ public class Superstructure extends Subsystem {
         mManualZoom = zoom;
     }
 
+    public synchronized void setmWantsPassthrough(boolean passthrough) {
+        mWantsPassthrough = passthrough;
+    }
+
     synchronized void followSetpoint() {
 
         if (SuperstructureConstants.kUseSmartdashboard) {
@@ -438,12 +443,21 @@ public class Superstructure extends Subsystem {
         if (mWantsSpinUp) {
             real_shooter = mShooterSetpoint;
             indexerAction = Indexer.WantedAction.PREP;
+            if (Indexer.getInstance().getShooterNeedsShoot() && mShooterSetpoint == 0) {
+                real_shooter = 4000.0;
+            }
             enableIndexer(true);
         }
 
         if (mWantsUnjam) {
             indexerAction = Indexer.WantedAction.BARF;
             intakeAction = Intake.WantedAction.BARF;
+        }
+
+        if (mWantsPassthrough) {
+            intakeAction = Intake.WantedAction.INTAKE;
+            indexerAction = Indexer.WantedAction.PASS_THROUGH;
+            real_shooter = 4000.0;
         }
 
         if (mEnableIndexer && mIndexShouldSpin) {

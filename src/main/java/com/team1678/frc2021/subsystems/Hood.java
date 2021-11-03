@@ -58,8 +58,18 @@ public class Hood extends ServoMotorSubsystem {
         return Util.epsilonEquals(getAngle(), Constants.kHoodConstants.kMinUnitsLimit, 5.0);
     }
 
+    private void updateHoming() {
+        mHoming = !new ServoMotorSubsystem(Constants.kHoodConstants) {
+            @Override
+            public boolean checkSystem() {
+                return false;
+            }
+        }.atHomingLocation();
+    }
+
     @Override
     public synchronized void writePeriodicOutputs() {
+        updateHoming();
         if (mHoming) {
             if (mControlState == ControlState.OPEN_LOOP) {
                 mMaster.set(ControlMode.PercentOutput, 0.0, DemandType.ArbitraryFeedForward, 0.0);
