@@ -6,12 +6,14 @@ import com.team1678.frc2021.loops.ILooper;
 import com.team1678.frc2021.loops.Loop;
 import com.team1678.frc2021.subsystems.*;
 import com.team1678.lib.util.InterpolatingDouble;
+import com.team1678.lib.vision.AimingParameters;
 import com.team1678.lib.util.UnitConversion;
 import com.team1678.lib.util.Util;
+import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Twist2d;
-import com.team254.lib.vision.AimingParameters;
 import com.team2910.lib.math.RigidTransform2;
 import com.team2910.lib.math.Rotation2;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Optional;
@@ -26,9 +28,11 @@ public class Superstructure extends Subsystem {
     private final Hood mHood = Hood.getInstance();
     private final Indexer mIndexer = Indexer.getInstance();
     private final RobotState mRobotState = RobotState.getInstance();
+    private final Intake mIntake = Intake.getInstance();
 
     private boolean mUseInnerTarget = false;
     private boolean mWantsUnjam = false;
+    private boolean mWantsPassthrough = false;
     private boolean mWantsHoodScan = false;
     private boolean mEnforceAutoAimMinDistance = false;
     private boolean mIndexShouldSpin = false;
@@ -377,10 +381,35 @@ public class Superstructure extends Subsystem {
         safetyReset();
     }
 
+    // Sets if wants auto aim
+    public synchronized void setWantAutoAim() {
+        setWantAutoAim(Rotation2.fromDegrees(180.0), false, 500);
+    }
+
+    public synchronized void setWantAutoAim(Rotation2 field_to_aim_hint, boolean enforce_min_distance,
+                                            double min_distance) {
+        mAimingMode = AimingControlModes.VISION_AIMED;
+        mFieldRelativeAimingGoal = field_to_aim_hint;
+        mEnforceAutoAimMinDistance = enforce_min_distance;
+        mAutoAimMinDistance = min_distance;
+    }
+
     // Aim like a God
     public synchronized void setAimOpenLoop(double throttle) {
         mAimingMode = AimingControlModes.OPEN_LOOP;
         mAimingThrottle = throttle;
+    }
+
+    public synchronized void setWantUnjam(boolean unjam) {
+        mWantsUnjam = unjam;
+    }
+
+    public synchronized void setManualZoom(boolean zoom) {
+        mManualZoom = zoom;
+    }
+
+    public synchronized void setmWantsPassthrough(boolean passthrough) {
+        mWantsPassthrough = passthrough;
     }
 
     synchronized void followSetpoint() {
@@ -401,66 +430,39 @@ public class Superstructure extends Subsystem {
             mHood.setSetpointMotionMagic(mHoodSetpoint);
         }
 
-        Indexer.WantedAction indexerAction = Indexer.WantedAction.PREP;
-        double real_trigger = 0.0;
+        Indexer.WantedAction indexerAction = Indexer.WantedAction.NONE;
+        Intake.WantedAction intakeAction = Intake.WantedAction.NONE;
+
         double real_shooter = 0.0;
-        boolean real_popout = false;
 
         if (Intake.getInstance().getState() == Intake.State.INTAKING) {
             mIndexShouldSpin = true;
             indexerAction = Indexer.WantedAction.PREP;
-            real_trigger = -600.0;
         }
 
         if (mWantsSpinUp) {
             real_shooter = mShooterSetpoint;
             indexerAction = Indexer.WantedAction.PREP;
-            real_trigger = -600.0;
-            enableIndexer(true);
-        } else if (mWantsPreShot) {
-            real_shooter = mShooterSetpoint;
-            indexerAction = Indexer.WantedAction.HELLA_ZOOM;
-            real_trigger = Constants.kTriggerRPM;
-            real_popout = false;
-        } else if (mWantsShoot) {
-            real_shooter = mShooterSetpoint;
-
-            if (mLatestAimingParameters.isPresent()) {
-                if (mLatestAimingParameters.get().getRange() > 240.) {
-                    indexerAction = Indexer.WantedAction.SLOW_ZOOM;
-                } else {
-                    indexerAction = Indexer.WantedAction.INDEX;
-                }
-            } else {
-                indexerAction = Indexer.WantedAction.INDEX;
+            if (Indexer.getInstance().getShooterNeedsShoot() && mShooterSetpoint == 0) {
+                real_shooter = 4000.0;
             }
-            real_trigger = Constants.kTriggerRPM;
-
-            if (mGotSpunUp) {
-                real_popout = true;
-                enableIndexer(true);
-            }
-
-            if (mShooter.spunUp()) {
-                mGotSpunUp = true;
-            }
-        } else if(mWantsTestSpit){
-            real_shooter = 1200;
-            indexerAction = Indexer.WantedAction.SLOW_ZOOM;
-            real_trigger = 4000.0;
-            real_popout = true;
             enableIndexer(true);
         }
 
-
         if (mWantsUnjam) {
-            indexerAction = Indexer.WantedAction.PREP;
-            real_popout = true;
-            real_trigger = -5000;
+            indexerAction = Indexer.WantedAction.BARF;
+            intakeAction = Intake.WantedAction.BARF;
+        }
+
+        if (mWantsPassthrough) {
+            intakeAction = Intake.WantedAction.INTAKE;
+            indexerAction = Indexer.WantedAction.PASS_THROUGH;
+            real_shooter = 4000.0;
         }
 
         if (mEnableIndexer && mIndexShouldSpin) {
             mIndexer.setState(indexerAction);
+            mIntake.setState(intakeAction);
         } else {
             mIndexer.setState(Indexer.WantedAction.PREP);
         }
@@ -493,10 +495,10 @@ public class Superstructure extends Subsystem {
             Limelight.getInstance().setPipeline(Limelight.kDefaultPipeline);
         }
 
-//        Limelight.getInstance().setPipeline(Limelight.kDefaultPipeline);
+        //Limelight.getInstance().setPipeline(Limelight.kDefaultPipeline);
 
         if (mAimingMode == AimingControlModes.OPEN_LOOP || !mEnableIndexer) {
-            // Noting happnes, hull aimed
+            // Noting happnes here for now, hull aimed
         } else {
             mTurnAimSetpoint = mAimSetpoint;
         }

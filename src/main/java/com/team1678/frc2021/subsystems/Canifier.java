@@ -32,14 +32,6 @@ public class Canifier extends Subsystem {
     }
 
     /**
-     * Reads the hood limit from the Periodic IO
-     * @return the hood limit
-     */
-    public synchronized boolean getHoodLimit() {
-        return mPeriodicInputs.hood_limit_;
-    }
-
-    /**
      * Gets the canifier device ID
      * @return the device ID as an integer
      */
@@ -54,9 +46,6 @@ public class Canifier extends Subsystem {
     public synchronized void readPeriodicInputs() {
         CANifier.PinValues pins = new CANifier.PinValues();
         mCanifier.getGeneralInputs(pins);
-
-        mPeriodicInputs.indexer_limit_ = !pins.SDA;
-        mPeriodicInputs.hood_limit_ = !pins.SPI_MOSI_PWM1;
 
     }
 
@@ -107,7 +96,6 @@ public class Canifier extends Subsystem {
      * The periodic inputs into the canifier
      */
     private static class PeriodicInputs {
-        public boolean indexer_limit_;
         public boolean hood_limit_;
     }
 }

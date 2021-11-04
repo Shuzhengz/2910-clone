@@ -7,7 +7,6 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import com.team1678.frc2021.Constants;
-import com.team1678.frc2021.subsystems.Canifier;
 import com.team254.lib.drivers.MotorChecker;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.team254.lib.drivers.BaseTalonChecker;
@@ -38,11 +37,10 @@ public class Hood extends ServoMotorSubsystem {
         //mMaster.setSelectedSensorPosition((int) unitsToTicks(17.66));
     }
 
-    /*
-    @Override
-    public synchronized boolean atHomingLocation() {
-        return Canifier.getInstance().getHoodLimit();
-    }*/
+    //@Override
+    //public synchronized boolean atHomingLocation() {
+    //   return Canifier.getHoodLimit(); TODO fix homing
+    //}
 
     public synchronized boolean isHoming() {
         return mHoming;
@@ -60,8 +58,18 @@ public class Hood extends ServoMotorSubsystem {
         return Util.epsilonEquals(getAngle(), Constants.kHoodConstants.kMinUnitsLimit, 5.0);
     }
 
+    private void updateHoming() {
+        mHoming = !new ServoMotorSubsystem(Constants.kHoodConstants) {
+            @Override
+            public boolean checkSystem() {
+                return false;
+            }
+        }.atHomingLocation();
+    }
+
     @Override
     public synchronized void writePeriodicOutputs() {
+        updateHoming();
         if (mHoming) {
             if (mControlState == ControlState.OPEN_LOOP) {
                 mMaster.set(ControlMode.PercentOutput, 0.0, DemandType.ArbitraryFeedForward, 0.0);
@@ -106,7 +114,7 @@ public class Hood extends ServoMotorSubsystem {
                 mRPMFloor = 90;
                 mCurrentEpsilon = 2.0;
                 mRPMEpsilon = 200;
-                mRPMSupplier = () -> mMaster.getSelectedSensorVelocity();
+                mRPMSupplier = mMaster::getSelectedSensorVelocity;
             }
         });
     }

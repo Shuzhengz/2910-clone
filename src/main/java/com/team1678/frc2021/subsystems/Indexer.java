@@ -1,7 +1,6 @@
 package com.team1678.frc2021.subsystems;
 
 import java.nio.channels.ReadPendingException;
-import java.util.Arrays;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
@@ -13,6 +12,7 @@ import com.team1678.frc2021.loops.Loop;
 import com.team254.lib.drivers.TalonFXFactory;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Indexer extends Subsystem {
@@ -20,36 +20,33 @@ public class Indexer extends Subsystem {
     // Variable Declarations
     private static Indexer mInstance = null;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
-    private double mIndexerStart;
 
     // Slot Proxies
     private final DigitalInput mLowerBeamBreak = new DigitalInput(Constants.kLowerBeamBreak);
     private final DigitalInput mUpperBeamBreak = new DigitalInput(Constants.kUpperBeamBreak);
 
     // Slot state arrays
-    private boolean[] mCleanSlots = { false, false, false };
+    private boolean mSlotsClean;
 
-
-    // Declare States and Wanted Actions
-    public enum WantedAction {
-        NONE, INDEX, UNJAM, PREP, FEED, SLOW_ZOOM, HELLA_ZOOM, BARF,
-    }
-
-    public enum State {
-        IDLE, INDEXING, UNJAMMING, PREPPING, FEEDING, SLOW_ZOOMING, HELLA_ZOOMING, BARFING,
-    }
+    private int mBallCount = 0;
 
     private int mCurrentSlot;
     private final TalonFX mMaster;
+
+    private boolean mIntakeHasBall;
+    private boolean mIntakeCanPass = false;
+    private boolean mIntakeReverse =  false;
+    private boolean mShooterNeedShoot = false;
+
     private State mState = State.IDLE;
 
-    private double mWaitTime = .1;   // seconds
-    private double mInitialTime = 0;
-    private double mOffset = 0;
+    public enum WantedAction {
+        NONE, PREP, ZOOM, BARF, FEED, PASS_THROUGH,
+    }
 
-    private boolean mGeneratedGoal = false;
-    private boolean mStartCounting = false;
-    private boolean mBackwards = false;
+    public enum State {
+        IDLE, PREPPING, ZOOMING, BARFING, FEEDING, PASSING_THROUGH,
+    }
 
     /**
      * The Indexer Utility Class
@@ -82,167 +79,27 @@ public class Indexer extends Subsystem {
     }
 
     /**
-     * Runs the state machine for the Indexer
-     */
-    public void runStateMachine() {
-        final double now = Timer.getFPGATimestamp();
-
-        switch (mState) {
-            // Idling
-            case IDLE:
-                mPeriodicIO.indexer_control_mode = ControlMode.Velocity;
-                mPeriodicIO.indexer_demand = 0;
-                break;
-            //Indexing, pushing balls to the shooter
-            case INDEXING:
-                mPeriodicIO.indexer_control_mode = ControlMode.MotionMagic;
-                //double distanceToSlot = mMotionPlanner.findDistanceGoal(findFurthestFilledSlot());
-                double distanceToSlot = 0;
-                mPeriodicIO.indexer_demand = distanceToSlot;
-                break;
-            // Backwards in case of jamming
-            case UNJAMMING:
-                mPeriodicIO.indexer_control_mode = ControlMode.Velocity;
-                mPeriodicIO.indexer_demand = -Constants.kZoomingVelocity;
-                break;
-            // Prepping the indexer for intake to intake
-            case PREPPING:
-                mPeriodicIO.indexer_control_mode = ControlMode.MotionMagic;
-                //double prepDistance = mMotionPlanner.findPrepDistance(findNearestFilledSlot());
-                double prepDistance = 0;
-                if (slotsEmpty()) {
-                    mPeriodicIO.clearForIntake = true;
-                } else if (prepDistance == 0) {
-                    mPeriodicIO.clearForIntake = true;
-                } else {
-                    mPeriodicIO.indexer_demand = prepDistance;
-                }
-                break;
-            // Feeding the shooter
-            case FEEDING:
-                mPeriodicIO.indexer_control_mode = ControlMode.MotionMagic;
-                if (!mStartCounting) {
-                    mInitialTime = now;
-                    mStartCounting = true;
-                }
-                if (mStartCounting && now - mInitialTime > mWaitTime) {
-                    mStartCounting = false;
-                }
-                //mPeriodicIO.indexer_demand = IndexerMotionPlanner.findDistanceGoal(findNearestFilledSlot());
-                mPeriodicIO.indexer_demand = 0;
-                break;
-            // Indexer slow running, for when the intake is running at slow speed
-            case SLOW_ZOOMING:
-                mPeriodicIO.indexer_control_mode = ControlMode.Velocity;
-                mPeriodicIO.indexer_demand = (mBackwards ? -Constants.kZoomingVelocity : Constants.kZoomingVelocity) * 0.3;
-                break;
-            // Indexer fast running, for when intake is running at fast speed AND shooter running
-            case HELLA_ZOOMING:
-                mPeriodicIO.indexer_control_mode = ControlMode.Velocity;
-                mPeriodicIO.indexer_demand = (mBackwards ? -Constants.kZoomingVelocity : Constants.kZoomingVelocity) * 1.5;
-                break;
-            // Spit all balls out back from the intake
-            case BARFING:
-                mPeriodicIO.indexer_control_mode = ControlMode.Velocity;
-                mPeriodicIO.indexer_demand = (-Constants.kZoomingVelocity) * 2; // TODO Make the intake barf as well
-                break;
-            default:
-                System.out.println("Fell through on Indexer states!");
-        }
-    }
-
-    /**
-     * Sets the states based on Wanted Actions
-     * @param wanted_state the Wanted Action Enum
-     */
-    public void setState(WantedAction wanted_state) {
-        final State prev_state = mState;
-
-        switch (wanted_state) {
-            case NONE:
-                mState = State.IDLE;
-                break;
-            case INDEX:
-                mState = State.INDEXING;
-                break;
-            case UNJAM:
-                mState = State.UNJAMMING;
-                break;
-            case PREP:
-                mState = State.PREPPING;
-                break;
-            case FEED:
-                mState = State.FEEDING;
-                break;
-            case SLOW_ZOOM:
-                mState = State.SLOW_ZOOMING;
-                break;
-            case HELLA_ZOOM:
-                mState = State.HELLA_ZOOMING;
-                break;
-            case BARF:
-                mState = State.BARFING;
-                break;
-        }
-
-        // Unjam the indexer
-        if (mState != prev_state && mState == State.UNJAMMING) {
-            mIndexerStart = Timer.getFPGATimestamp();
-            mBackwards = true;
-        }
-
-        // Reverse complete
-        if (mState != prev_state && prev_state == State.UNJAMMING && mState != State.BARFING) {
-            mIndexerStart = Timer.getFPGATimestamp();
-            mBackwards = false;
-        }
-
-        // Zooming ramping up
-        if (mState != prev_state && mState == State.FEEDING) {
-            mMaster.configClosedloopRamp(0.2, 0);
-        } else if (mState != prev_state) {
-            mMaster.configClosedloopRamp(0.0, 0);
-        }
-    }
-
-    /**
      * Returns the Indexer velocity
      * @return Indexer velocity
      */
-    public double getIndexerVelocity() {
+    public double getIndexerDemand() {
         double rValue = 0;
         try {
-            if (mPeriodicIO.indexer_control_mode == ControlMode.Velocity) { rValue = mPeriodicIO.indexer_demand; }
+            if (mPeriodicIO.indexer_control_mode == ControlMode.PercentOutput) {
+                rValue = mPeriodicIO.indexer_demand;
+            }
         } catch (ReadPendingException readError) {
             System.out.println("Unable to read Indexer Velocity");
         }
         return rValue;
     }
 
-    public int findNearestFilledSlot() {
-        int rValue = 0;
-        for (int i = 0; i < 3; i++) {
-            if (mCleanSlots[i]) { rValue = i; }
-        }
-        return rValue;
-    }
-
-    public int findFurthestFilledSlot () {
-        int nValue = 0;
-        int rValue = 0;
-        for (int i = 0; i < 2; i++) {
-            if (mCleanSlots[i]) {
-                nValue = i;
-                break;
-            }
-        }
-        for (int i = nValue; i < 2; i++) {
-            if (!mCleanSlots[i]) {
-                rValue = i;
-                break;
-            }
-        }
-        return rValue;
+    /**
+     * Spins the motor, in the percentage output control mode
+     * @param speed the speed you want to spin it at
+     */
+    private void spinMotor(double speed) {
+        mPeriodicIO.indexer_demand = speed;
     }
 
     /**
@@ -250,7 +107,18 @@ public class Indexer extends Subsystem {
      * @return Are the slots filled
      */
     public synchronized boolean slotsFilled() {
-        return Arrays.equals(mCleanSlots, Constants.kFullSlots);
+        return mSlotsClean;
+    }
+
+    /**
+     * Checks if the indexer should Index
+     * @return if it should index
+     */
+    public boolean shouldIndex() {
+        if(slotsFilled()){
+            return false;
+        }
+        return isBallAtIntake();
     }
 
     /**
@@ -258,15 +126,7 @@ public class Indexer extends Subsystem {
      * @return Are the slots empty
      */
     public synchronized boolean slotsEmpty() {
-        return Arrays.equals(mCleanSlots, Constants.kEmptySlots);
-    }
-
-    /**
-     * Gets the current state of the Indexer
-     * @return Indexer State
-     */
-    public synchronized State getState() {
-        return mState;
+        return !mSlotsClean;
     }
 
     /**
@@ -281,37 +141,41 @@ public class Indexer extends Subsystem {
     }
 
     /**
-     * Sets the Indexer output to the Smart Dashboard on the Driverstation
-     */
-    @Override
-    public void outputTelemetry() {
-        SmartDashboard.putString("IndexerControlMode", mPeriodicIO.indexer_control_mode.name());
-        SmartDashboard.putNumber("IndexerSetpoint", mPeriodicIO.indexer_demand);
-        SmartDashboard.putNumber("IndexerVelocity", mPeriodicIO.indexer_velocity);
-        SmartDashboard.putNumber("IndexerOffset", mOffset);
-
-        SmartDashboard.putNumber("Nearest Filled Slot", findNearestFilledSlot());
-
-        SmartDashboard.putString("DirtySlots", Arrays.toString(mPeriodicIO.raw_slots));
-        SmartDashboard.putString("CleanSlots", Arrays.toString(mCleanSlots));
-        SmartDashboard.putBoolean("Snapped", mPeriodicIO.snapped);
-    }
-
-    /**
      * Updates the slot status
-     * @param indexer_angle Angle of the indexer
      */
-    private void updateSlots(double indexer_angle) {
-        mCleanSlots = mPeriodicIO.raw_slots;
+    private void updateSlots() {
+        mIntakeHasBall = mPeriodicIO.beamBreakSensor[0];
+        mSlotsClean = mPeriodicIO.beamBreakSensor[1];
+        if (mBallCount != 0) { mSlotsClean = false; }
     }
 
     /**
-     * Sets the percentage for the open loop
+     * Checks if the lower beambreak sensor has a ball
+     * @return ic the lower beambreak has a ball
+     */
+    private boolean isBallAtIntake() {
+        return mIntakeHasBall;
+    }
+
+    /**
+     * Sets the percentage for the open loop, percent output mode for the indexer
      * @param percentage The Percentage to set the open loop at
      */
     public synchronized void setOpenLoop(double percentage) {
         mPeriodicIO.indexer_control_mode = ControlMode.PercentOutput;
         mPeriodicIO.indexer_demand = percentage;
+    }
+
+    public synchronized boolean getIntakeCanPass() {
+        return mIntakeCanPass;
+    }
+
+    public synchronized boolean getIntakeReverse() {
+        return mIntakeReverse;
+    }
+
+    public synchronized boolean getShooterNeedsShoot() {
+        return mShooterNeedShoot;
     }
 
     /**
@@ -320,6 +184,7 @@ public class Indexer extends Subsystem {
     @Override
     public void stop() {
         setOpenLoop(0);
+        mMaster.set(ControlMode.PercentOutput, 0);
     }
 
     /**
@@ -348,7 +213,7 @@ public class Indexer extends Subsystem {
         enabledLooper.register(new Loop() {
             @Override
             public void onStart(double timestamp) {
-                mState = State.INDEXING;
+                mState = State.IDLE;
             }
 
             @Override
@@ -360,9 +225,104 @@ public class Indexer extends Subsystem {
 
             @Override
             public void onStop(double timestamp) {
+                // Things to do on stop
                 mState = State.IDLE;
+                stop();
             }
         });
+    }
+
+    public void runStateMachine() {
+        updateSlots();
+        switch (mState) {
+            case IDLE:
+                mIntakeCanPass = false;
+                mIntakeReverse = false;
+                mShooterNeedShoot = false;
+                spinMotor(0);
+                break;
+            case PREPPING:
+                mShooterNeedShoot = false;
+                mIntakeReverse = false;
+                mIntakeCanPass = false;
+                if (slotsEmpty()) {
+                    spinMotor(Constants.kIndexingSpeed);
+                } else if (!slotsFilled() && mIntakeHasBall) {
+                    spinMotor(Constants.kZoomingSpeed);
+                } else {
+                    boolean atIntake = false;
+                    spinMotor(-Constants.kIndexingSpeed);
+                    while (!atIntake) {
+                        atIntake = mLowerBeamBreak.get();
+                    }
+                    spinMotor(0);
+                    mState = State.FEEDING;
+                }
+                break;
+            case ZOOMING:
+                mShooterNeedShoot = false;
+                mIntakeReverse = false;
+                if (slotsEmpty()) {
+                    spinMotor(Constants.kZoomingSpeed);
+                    mShooterNeedShoot = true;
+                    mIntakeCanPass = true;
+                } else if (slotsEmpty() && mIntakeHasBall) {
+                    spinMotor(Constants.kZoomingSpeed);
+                    try { Thread.sleep(100); }
+                    catch (InterruptedException ex) { Thread.currentThread().interrupt(); }
+                    mShooterNeedShoot = true;
+                    mIntakeCanPass = true;
+                } else {
+                    mShooterNeedShoot = true;
+                    mIntakeCanPass = true;
+                    spinMotor(Constants.kZoomingSpeed);
+                }
+                break;
+            case BARFING:
+                spinMotor(Constants.kBarfingSpeed);
+                mIntakeReverse = true;
+                mShooterNeedShoot = false;
+                break;
+            case FEEDING:
+                //TODO complete
+                mIntakeReverse = false;
+                mIntakeCanPass = true;
+                mShooterNeedShoot = false;
+                if (mBallCount == 3) {
+                    System.out.println("Indexer full");
+                } else if (mBallCount < 3 && mBallCount > 0) {
+                    spinMotor(Constants.kIndexingSpeed);
+                }
+                break;
+            case PASSING_THROUGH:
+                mIntakeReverse = false;
+                mIntakeCanPass = true;
+                mShooterNeedShoot = true;
+                spinMotor(Constants.kIndexingSpeed);
+        }
+    }
+
+    public void setState(WantedAction wanted_state) {
+        switch (wanted_state) {
+            case NONE:
+                mState = State.IDLE;
+                break;
+            case PREP:
+                mState = State.PREPPING;
+                break;
+            case ZOOM:
+                mState = State.ZOOMING;
+                break;
+            case BARF:
+                mState = State.BARFING;
+                break;
+            case FEED:
+                mState = State.FEEDING;
+                break;
+            case PASS_THROUGH:
+                mState = State.PASSING_THROUGH;
+                break;
+        }
     }
 
     /**
@@ -371,9 +331,24 @@ public class Indexer extends Subsystem {
     @Override
     public synchronized void readPeriodicInputs() {
         mPeriodicIO.timestamp = Timer.getFPGATimestamp();
-        mPeriodicIO.raw_slots[0] = mLowerBeamBreak.get();  // Slot closest to the shooter
-        mPeriodicIO.raw_slots[1] = mUpperBeamBreak.get();
+        mPeriodicIO.beamBreakSensor[0] = mLowerBeamBreak.get();  // Slot closest to the shooter
+        mPeriodicIO.beamBreakSensor[1] = mUpperBeamBreak.get();
         mPeriodicIO.indexer_current = mMaster.getStatorCurrent();
+    }
+
+    /**
+     * Sets the Indexer output to the Smart Dashboard on the Driverstation
+     */
+    @Override
+    public void outputTelemetry() {
+        SmartDashboard.putString("IndexerControlMode", mPeriodicIO.indexer_control_mode.name());
+        SmartDashboard.putNumber("IndexerDemand", mPeriodicIO.indexer_demand);
+        SmartDashboard.putNumber("IndexerVelocity", mPeriodicIO.indexer_velocity);
+
+        SmartDashboard.putNumber("BallsInIndexer", mBallCount);
+        SmartDashboard.putBoolean("LowerBeamBreak", mPeriodicIO.beamBreakSensor[0]);
+        SmartDashboard.putBoolean("UpperBeamBreak", mPeriodicIO.beamBreakSensor[1]);
+        SmartDashboard.putBoolean("Snapped", mPeriodicIO.snapped);
     }
 
     /**
@@ -382,7 +357,7 @@ public class Indexer extends Subsystem {
     public static class PeriodicIO {
         // INPUTS
         public double timestamp;
-        private boolean[] raw_slots = { false, false, false };
+        private boolean[] beamBreakSensor = { false, false };
 
         public double indexer_velocity;
         public double indexer_current;
