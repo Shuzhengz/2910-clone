@@ -1,13 +1,12 @@
 package com.team1678.frc2021.auto.modes;
 
-import java.util.List;
-
 import com.team1678.frc2021.auto.AutoModeBase;
 import com.team1678.frc2021.auto.AutoModeEndedException;
 import com.team1678.frc2021.auto.actions.ResetPoseAction;
 import com.team2910.lib.control.Trajectory;
-
 import edu.wpi.first.wpilibj.Timer;
+
+import java.util.List;
 
 public class TestStraightPath extends AutoModeBase {
 

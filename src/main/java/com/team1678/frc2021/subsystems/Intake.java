@@ -5,17 +5,11 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.team1678.frc2021.Constants;
 import com.team1678.frc2021.loops.ILooper;
 import com.team1678.frc2021.loops.Loop;
-
 import com.team254.lib.drivers.TalonFXFactory;
-import com.team254.lib.util.TimeDelayedBoolean;
-
 import com.team254.lib.util.ReflectingCSVWriter;
-
-import edu.wpi.first.wpilibj.Timer;
+import com.team254.lib.util.TimeDelayedBoolean;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import java.util.ArrayList;
 
 public class Intake extends Subsystem {
 

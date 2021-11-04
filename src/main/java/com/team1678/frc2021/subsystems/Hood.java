@@ -3,28 +3,22 @@ package com.team1678.frc2021.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-
-import com.team1678.frc2021.Constants;
-import com.team254.lib.drivers.MotorChecker;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
+import com.team1678.frc2021.Constants;
 import com.team254.lib.drivers.BaseTalonChecker;
-
-import com.team254.lib.drivers.TalonUtil;
+import com.team254.lib.drivers.MotorChecker;
 import com.team254.lib.util.Util;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.AnalogEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.ArrayList;
 
 public class Hood extends ServoMotorSubsystem {
-    private AnalogEncoder mEncoder;
+    protected static AnalogEncoder mEncoder;
     private static Hood mInstance;
     private boolean mHoming = true;
 
-    public synchronized static Hood getInstance() {
+    public static synchronized Hood getInstance() {
         if (mInstance == null) {
             mInstance = new Hood(Constants.kHoodConstants);
         }
@@ -103,11 +97,9 @@ public class Hood extends ServoMotorSubsystem {
         return BaseTalonChecker.checkMotors(this, new ArrayList<MotorChecker.MotorConfig<BaseTalon>>() {
             private static final long serialVersionUID = -716113039054569446L;
 
-            {
-                add(new MotorChecker.MotorConfig<>("master", mMaster));
-            }
+            { add(new MotorChecker.MotorConfig<>("master", mMaster)); }
         }, new MotorChecker.CheckerConfig() {
-            {
+             {
                 mRunOutputPercentage = 0.5;
                 mRunTimeSec = 1.0;
                 mCurrentFloor = 0.1;

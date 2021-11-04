@@ -6,14 +6,12 @@ import com.team1678.frc2021.loops.ILooper;
 import com.team1678.frc2021.loops.Loop;
 import com.team1678.frc2021.subsystems.*;
 import com.team1678.lib.util.InterpolatingDouble;
-import com.team1678.lib.vision.AimingParameters;
 import com.team1678.lib.util.UnitConversion;
 import com.team1678.lib.util.Util;
-import com.team254.lib.geometry.Rotation2d;
+import com.team1678.lib.vision.AimingParameters;
 import com.team254.lib.geometry.Twist2d;
 import com.team2910.lib.math.RigidTransform2;
 import com.team2910.lib.math.Rotation2;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Optional;
@@ -216,6 +214,24 @@ public class Superstructure extends Subsystem {
         mLatestAimingParameters = Optional.empty();
     }
 
+    public synchronized void setWantShoot(boolean shoot) {
+        mWantsSpinUp = false;
+        mWantsShoot = shoot;
+        mGotSpunUp = false;
+        mWantsPreShot = false;
+    }
+
+    public synchronized void setWantSpinUp() {
+        mWantsSpinUp = !mWantsSpinUp;
+        mWantsShoot = false;
+        mGotSpunUp = false;
+        mWantsPreShot = false;
+    }
+
+    public synchronized void setWantTuck(boolean tuck) {
+        mWantsTuck = tuck;
+    }
+
     public synchronized boolean getDisableLimelight() {
         return mDisableLimelight;
     }
@@ -410,6 +426,26 @@ public class Superstructure extends Subsystem {
 
     public synchronized void setmWantsPassthrough(boolean passthrough) {
         mWantsPassthrough = passthrough;
+    }
+
+    public synchronized Optional<AimingParameters> getLatestAimingParameters() {
+        return mLatestAimingParameters;
+    }
+
+    public synchronized boolean isOnTarget() {
+        return mOnTarget;
+    }
+
+    public synchronized boolean getTucked() {
+        return mWantsTuck;
+    }
+
+    public synchronized boolean getWantSpit() {
+        return mWantsTestSpit;
+    }
+
+    public synchronized void setWantTestSpit() {
+        mWantsTestSpit = !mWantsTestSpit;
     }
 
     synchronized void followSetpoint() {

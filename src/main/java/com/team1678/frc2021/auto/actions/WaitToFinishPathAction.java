@@ -1,7 +1,6 @@
 package com.team1678.frc2021.auto.actions;
 
 import com.team1678.frc2021.subsystems.Swerve;
-
 import edu.wpi.first.wpilibj.Timer;
 
 public class WaitToFinishPathAction implements Action{

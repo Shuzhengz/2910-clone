@@ -1,9 +1,7 @@
 package com.team1678.frc2021.auto;
 
 import com.team1678.frc2021.auto.modes.StandStillMode;
-
 import com.team1678.frc2021.auto.modes.TestStraightPath;
-
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 

@@ -5,11 +5,7 @@
 package com.team1678.frc2021;
 
 import com.team1678.frc2021.commands.TeleopSwerve;
-import com.team1678.frc2021.subsystems.Indexer;
-import com.team1678.frc2021.subsystems.Intake;
-import com.team1678.frc2021.subsystems.Shooter;
 import com.team1678.frc2021.subsystems.Swerve;
-
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -64,7 +60,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     /* Driver Buttons */
-    zeroGyro.whenPressed(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    zeroGyro.whenPressed(new InstantCommand(s_Swerve::zeroGyro));
     // Snap Commands
     yButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(0)));
     bButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(90)));

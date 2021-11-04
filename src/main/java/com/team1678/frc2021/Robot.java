@@ -4,27 +4,17 @@
 package com.team1678.frc2021;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.team1678.frc2021.auto.AutoModeBase;
+import com.team1678.frc2021.controlboard.ControlBoard;
 import com.team1678.frc2021.loops.Looper;
 import com.team1678.frc2021.subsystems.*;
 import com.team1678.frc2021.subsystems.superstructure.Superstructure;
-import com.team1678.frc2021.controlboard.ControlBoard;
-
-import com.team254.lib.geometry.Pose2d;
-import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.CrashTracker;
 import com.team2910.lib.math.RigidTransform2;
-import com.team2910.lib.robot.UpdateManager;
-
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-
-import java.util.Optional;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -45,7 +35,7 @@ public class Robot extends TimedRobot {
 
     private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
-    //private final Hood mHood = Hood.getInstance();
+    private final Hood mHood = Hood.getInstance();
     private final Shooter mShooter = Shooter.getInstance();
     private final Superstructure mSuperstructure = Superstructure.getInstance();
     private final Limelight mLimelight = Limelight.getInstance();
@@ -101,7 +91,7 @@ public class Robot extends TimedRobot {
 
             mSubsystemManager.setSubsystems(
                     mLEDs,
-                    //mHood,
+                    mHood,
                     mIntake,
                     mShooter,
                     mCanifier,
@@ -133,7 +123,7 @@ public class Robot extends TimedRobot {
         RobotState.getInstance().reset(Timer.getFPGATimestamp(), RigidTransform2.identity());
 
         mDisabledLooper.start();
-        //mHood.setNeutralMode(NeutralMode.Coast);
+        mHood.setNeutralMode(NeutralMode.Coast);
         mLimelight.writePeriodicOutputs();
         mLEDs.conformToState(LEDs.State.RAINBOW);
     }
@@ -150,8 +140,8 @@ public class Robot extends TimedRobot {
 
             if (!mLimelight.limelightOK()) {
                 mLEDs.conformToState(LEDs.State.EMERGENCY);
-            //} else if (mHood.isHoming()) {
-            //    mLEDs.conformToState(LEDs.State.RAINBOW);
+            } else if (mHood.isHoming()) {
+                mLEDs.conformToState(LEDs.State.RAINBOW);
             } else {
                 mLEDs.conformToState(LEDs.State.BREATHING_PINK);
             }
@@ -185,7 +175,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousPeriodic() {
         SmartDashboard.putString("Match Cycle", "AUTONOMOUS");
-        //mLimelight.setLed(Limelight.LedMode.ON);
+        mLimelight.setLed(Limelight.LedMode.ON);
 
         if (!mLimelight.limelightOK()) {
             mLEDs.conformToState(LEDs.State.EMERGENCY);
@@ -218,12 +208,11 @@ public class Robot extends TimedRobot {
             mEnabledLooper.start();
             mLimelight.setLed(Limelight.LedMode.ON);
             mLimelight.setPipeline(Constants.kPortPipeline);
-            //mHood.setNeutralMode(NeutralMode.Brake);
+            mHood.setNeutralMode(NeutralMode.Brake);
             mLEDs.conformToState(LEDs.State.ENABLED);
 
             mControlBoard.reset();
-
-        } catch (Throwable t) {
+        } catch (Exception t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
         }
@@ -241,23 +230,67 @@ public class Robot extends TimedRobot {
 
             if (!mLimelight.limelightOK()) {
                 mLEDs.conformToState(LEDs.State.EMERGENCY);
+            } else if (mSuperstructure.getTucked()) {
+                mLEDs.conformToState(LEDs.State.HOOD_TUCKED);
+            } else if (mSuperstructure.isOnTarget() && mLimelight.seesTarget()) {
+                mLEDs.conformToState(LEDs.State.TARGET_TRACKING);
+            } else if (mSuperstructure.isOnTarget()) {
+                mLEDs.conformToState(LEDs.State.INVISIBLE_TARGET_TRACKING);
+            } else if (mSuperstructure.getLatestAimingParameters().isPresent() && !mLimelight.seesTarget() && !mSuperstructure.getScanningHood()) {
+                mLEDs.conformToState(LEDs.State.TARGET_VISIBLE);
+            } else if (mLimelight.seesTarget()) {
+                mLEDs.conformToState(LEDs.State.LIMELIGHT_SEES_ONLY);
             } else {
                 mLEDs.conformToState(LEDs.State.ENABLED);
             }
 
+            if (mControlBoard.getShotUp()) {
+                mSuperstructure.setAngleAdd(1.0);
+            } else if (mControlBoard.getShotDown()) {
+                mSuperstructure.setAngleAdd(-1.0);
+            }
+
             mSuperstructure.enableIndexer(true);
 
-            // TODO link to the buttons, manual zoom is indexer in god mode
-            //mSuperstructure.setWantUnjam();
-            //mSuperstructure.setManualZoom();
-            //mSuperstructure.setmWantsPassthrough();
+            mSuperstructure.setWantUnjam(mControlBoard.getWantUnjam());
+            mSuperstructure.setManualZoom(mControlBoard.getManualZoom());
+            mSuperstructure.setmWantsPassthrough(mControlBoard.getWantPassThrough());
 
             mControlBoard.setRumble(mSuperstructure.getWantShoot());
             mSuperstructure.setWantHoodScan(mControlBoard.getWantHoodScan());
 
             mSuperstructure.setWantAutoAim();
 
-            mIntake.setState(Intake.WantedAction.NONE);
+            if (mControlBoard.getShoot()) {
+                if (mSuperstructure.isAimed() ||  mSuperstructure.getWantSpit() || mSuperstructure.getLatestAimingParameters().isEmpty()) {
+                    mSuperstructure.setWantShoot(true);
+                }
+            } else if (mControlBoard.getSpinDown()) {
+                mSuperstructure.setWantShoot(false);
+            } else if (mControlBoard.getSpinUp()) {
+                mSuperstructure.setWantSpinUp();
+            } else if (mControlBoard.getTuck()) {
+                mSuperstructure.setWantTuck(true);
+            } else if (mControlBoard.getUntuck()) {
+                mSuperstructure.setWantTuck(false);
+            } else if (mControlBoard.getTurretReset()) {
+                mRobotState.resetVision();
+                mRobotState.reset(Timer.getFPGATimestamp(), RigidTransform2.identity());
+            } else if (mControlBoard.getTestSpit()) {
+                mSuperstructure.setWantTestSpit();
+            } else if (mControlBoard.getRunIntake()) {
+                if (!mSuperstructure.getWantShoot()) {
+                    mIntake.setState(Intake.WantedAction.INTAKE);
+                } else {
+                    mIntake.setState(Intake.WantedAction.STAY_OUT);
+                }
+            } else if (mControlBoard.getRetractIntake()) {
+                mIntake.setState(Intake.WantedAction.RETRACT);
+            } else {
+                mIntake.setState(Intake.WantedAction.NONE);
+            }
+
+            mLEDs.writePeriodicOutputs();
 
         } catch (Exception t) {
             CrashTracker.logThrowableCrash(t);
@@ -267,8 +300,18 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
-        // Cancels all running commands at the start of test mode.
-        CommandScheduler.getInstance().cancelAll();
+        SmartDashboard.putString("Match Cycle", "TEST");
+
+        try {
+            System.out.println("Starting check systems.");
+
+            mDisabledLooper.stop();
+            mEnabledLooper.stop();
+
+        } catch (Throwable t) {
+            CrashTracker.logThrowableCrash(t);
+            throw t;
+        }
     }
 
     /**

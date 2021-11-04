@@ -8,7 +8,6 @@
 package com.team1678.frc2021.auto.actions;
 
 import com.team1678.frc2021.subsystems.Pigeon;
-
 import edu.wpi.first.wpilibj.Timer;
 
 public class WaitToLeaveRampAction implements Action{

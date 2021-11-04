@@ -8,15 +8,17 @@ import com.team254.lib.util.InterpolatingTreeMap;
 import com.team254.lib.util.MovingAverageTwist2d;
 import com.team254.lib.vision.GoalTracker;
 import com.team254.lib.vision.GoalTracker.TrackReportComparator;
+import com.team254.lib.vision.TargetInfo;
 import com.team2910.lib.math.RigidTransform2;
 import com.team2910.lib.math.Rotation2;
 import com.team2910.lib.math.Vector2;
-import com.team254.lib.vision.TargetInfo;
-
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class RobotState {
     private static RobotState mInstance;

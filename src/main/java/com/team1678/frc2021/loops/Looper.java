@@ -1,14 +1,13 @@
 package com.team1678.frc2021.loops;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.team1678.frc2021.Constants;
 import com.team1323.lib.util.CrashTrackingRunnable;
-
+import com.team1678.frc2021.Constants;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This code runs all of the robot's loops. Loop objects are stored in a List object. They are started when the robot

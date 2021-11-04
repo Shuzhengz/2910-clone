@@ -1,13 +1,12 @@
 package com.team1678.frc2021.vision;
 
+import com.team1678.frc2021.Constants;
+import com.team254.lib.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-
-import com.team1678.frc2021.Constants;
-import com.team254.lib.geometry.Translation2d;
-
-import edu.wpi.first.wpilibj.Timer;
 
 /**
  * A class that is used to keep track of all goals detected by the vision system. As goals are detected/not detected

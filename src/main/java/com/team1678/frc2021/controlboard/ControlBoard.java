@@ -1,11 +1,5 @@
 package com.team1678.frc2021.controlboard;
 
-import com.team1678.frc2021.Constants;
-import com.team1678.frc2021.controlboard.GamepadButtonControlBoard;
-import com.team1678.frc2021.controlboard.GamepadButtonControlBoard.TurretCardinal;
-import com.team254.lib.geometry.Rotation2d;
-import com.team1678.frc2021.controlboard.CustomXboxController.Side;
-
 public class ControlBoard {
     private static ControlBoard mInstance = null;
 
@@ -50,10 +44,6 @@ public class ControlBoard {
 
     public boolean getRetractIntake() {
         return mButtonControlBoard.getRetractIntake();
-    }
-
-    public Rotation2d getJogTurret() {
-        return mButtonControlBoard.getJogTurret();
     }
 
     public double getJogHood() {
@@ -154,15 +144,19 @@ public class ControlBoard {
         return mButtonControlBoard.getWrangle();
     }
 
+    public boolean getWantPassThrough() {
+        return mButtonControlBoard.getPassThrough();
+    }
+
+    public boolean getSpinDown() {
+        return mButtonControlBoard.getSpinDown();
+    }
+
 
     public boolean climbMode() {
         return mButtonControlBoard.climbMode();
         //return mController.getButton(XboxController.Button.LB) && mController.getButton(XboxController.Button.RB)  &&
         //mController.getTrigger(XboxController.Side.LEFT) &&  mController.getTrigger(XboxController.Side.RIGHT);
-    }
-
-    public TurretCardinal getTurretCardinal() {
-        return mButtonControlBoard.getTurretCardinal();
     }
 
     public boolean getLeaveClimbMode() {

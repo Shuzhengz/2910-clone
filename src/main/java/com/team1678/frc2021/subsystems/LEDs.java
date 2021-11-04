@@ -7,20 +7,16 @@
 
 package com.team1678.frc2021.subsystems;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.team1678.frc2021.subsystems.Canifier;
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifier.LEDChannel;
-import com.team1678.frc2021.Ports;
-import com.team1678.frc2021.loops.ILooper;
-import com.team1678.frc2021.loops.Loop;
-import com.team1678.frc2021.Constants;
 import com.team1323.lib.util.HSVtoRGB;
 import com.team1323.lib.util.MovingAverage;
-
+import com.team1678.frc2021.loops.ILooper;
+import com.team1678.frc2021.loops.Loop;
 import edu.wpi.first.wpilibj.Timer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Brings all da colors to da club
@@ -56,6 +52,9 @@ public class LEDs extends Subsystem{
         DISABLED(255.0, 20.0, 30.0, Double.POSITIVE_INFINITY, 0.0, false),
         ENABLED(0.0, 0.0, 255.0, Double.POSITIVE_INFINITY, 0.0, false),
         EMERGENCY(255.0, 0.0, 0.0, 0.5, 0.5, false),
+        LIMELIGHT_SEES_ONLY(0.0, 255.0, 0.0, Double.POSITIVE_INFINITY, 0.0, false),
+        INVISIBLE_TARGET_TRACKING(255.0, 255.0, 0.0, 0.0625, 0.0625, false),
+        HOOD_TUCKED(255.0, 20.0, 0.0, Double.POSITIVE_INFINITY, 0.0, false),
         BALL_IN_INTAKE(255.0, 20.0, 0.0, 0.5, 0.5, false),
         BALL_IN_CARRIAGE(255.0, 20.0, 0.0, Double.POSITIVE_INFINITY, 0.0, false),
         DISK_IN_INTAKE(255.0, 60.0, 0.0, 0.5, 0.5, false),

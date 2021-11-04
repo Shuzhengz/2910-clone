@@ -7,9 +7,8 @@ import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.util.Deadband;
 import com.team254.lib.util.DelayedBoolean;
-
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.Timer;
 
 public class GamepadButtonControlBoard {
     private final double kDeadband = 0.15;
@@ -147,6 +146,10 @@ public class GamepadButtonControlBoard {
         return mController.getController().getYButtonPressed();
     }
 
+    public boolean getSpinDown() {
+        return mController.getController().getBButtonPressed();
+    }
+
     public boolean getPreShot() {
         return mController.getController().getBButtonReleased();
     }
@@ -257,6 +260,10 @@ public class GamepadButtonControlBoard {
 
     public boolean getWrangle() {
         return mController.getButton(CustomXboxController.Button.X);
+    }
+
+    public boolean getPassThrough() {
+        return mController.getButton(CustomXboxController.Button.A);
     }
 
     public boolean getLeaveClimbMode() {
