@@ -147,6 +147,10 @@ public class GamepadButtonControlBoard {
         return mController.getController().getYButtonPressed();
     }
 
+    public boolean getSpinDown() {
+        return mController.getController().getBButtonPressed();
+    }
+
     public boolean getPreShot() {
         return mController.getController().getBButtonReleased();
     }
@@ -257,6 +261,10 @@ public class GamepadButtonControlBoard {
 
     public boolean getWrangle() {
         return mController.getButton(CustomXboxController.Button.X);
+    }
+
+    public boolean getPassThrough() {
+        return mController.getButton(CustomXboxController.Button.A);
     }
 
     public boolean getLeaveClimbMode() {

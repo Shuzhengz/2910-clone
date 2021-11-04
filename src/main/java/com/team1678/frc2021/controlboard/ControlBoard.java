@@ -52,10 +52,6 @@ public class ControlBoard {
         return mButtonControlBoard.getRetractIntake();
     }
 
-    public Rotation2d getJogTurret() {
-        return mButtonControlBoard.getJogTurret();
-    }
-
     public double getJogHood() {
         return mButtonControlBoard.getJogHood();
     }
@@ -154,15 +150,19 @@ public class ControlBoard {
         return mButtonControlBoard.getWrangle();
     }
 
+    public boolean getWantPassThrough() {
+        return mButtonControlBoard.getPassThrough();
+    }
+
+    public boolean getSpinDown() {
+        return mButtonControlBoard.getSpinDown();
+    }
+
 
     public boolean climbMode() {
         return mButtonControlBoard.climbMode();
         //return mController.getButton(XboxController.Button.LB) && mController.getButton(XboxController.Button.RB)  &&
         //mController.getTrigger(XboxController.Side.LEFT) &&  mController.getTrigger(XboxController.Side.RIGHT);
-    }
-
-    public TurretCardinal getTurretCardinal() {
-        return mButtonControlBoard.getTurretCardinal();
     }
 
     public boolean getLeaveClimbMode() {
