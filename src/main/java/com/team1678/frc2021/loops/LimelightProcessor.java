@@ -1,14 +1,13 @@
 package com.team1678.frc2021.loops;
 
+import com.team1678.frc2021.RobotState;
+import com.team1678.frc2021.vision.TargetInfo;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.team1678.frc2021.RobotState;
-import com.team1678.frc2021.vision.TargetInfo;
-
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class LimelightProcessor implements Loop{
 	static LimelightProcessor instance = new LimelightProcessor();

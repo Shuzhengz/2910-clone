@@ -7,9 +7,8 @@ import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.util.Deadband;
 import com.team254.lib.util.DelayedBoolean;
-
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.Timer;
 
 public class GamepadButtonControlBoard {
     private final double kDeadband = 0.15;

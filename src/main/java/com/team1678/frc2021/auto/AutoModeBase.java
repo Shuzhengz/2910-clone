@@ -3,11 +3,10 @@ package com.team1678.frc2021.auto;
 import com.team1678.frc2021.auto.actions.Action;
 import com.team2910.lib.autos.AutonomousTrajectories;
 import com.team2910.lib.control.Trajectory;
-
 import edu.wpi.first.wpilibj.Timer;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An abstract class that is the basis of the robot's autonomous routines. This

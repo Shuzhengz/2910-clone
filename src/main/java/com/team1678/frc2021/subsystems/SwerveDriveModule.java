@@ -6,14 +6,13 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
-import edu.wpi.first.wpilibj.Notifier;
-import com.team2910.lib.robot.SwerveModule;
+import com.team1678.frc2021.Constants;
 import com.team2910.lib.math.RigidTransform2;
 import com.team2910.lib.math.Vector2;
+import com.team2910.lib.robot.SwerveModule;
+import edu.wpi.first.wpilibj.Notifier;
 
 import java.util.Optional;
-
-import com.team1678.frc2021.Constants;
 
 public class SwerveDriveModule extends SwerveModule {
     private static final double TALONFX_COUNTS_PER_REVOLUTION = 2048;

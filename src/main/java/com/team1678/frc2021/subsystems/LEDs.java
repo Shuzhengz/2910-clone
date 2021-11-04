@@ -7,20 +7,16 @@
 
 package com.team1678.frc2021.subsystems;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.team1678.frc2021.subsystems.Canifier;
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifier.LEDChannel;
-import com.team1678.frc2021.Ports;
-import com.team1678.frc2021.loops.ILooper;
-import com.team1678.frc2021.loops.Loop;
-import com.team1678.frc2021.Constants;
 import com.team1323.lib.util.HSVtoRGB;
 import com.team1323.lib.util.MovingAverage;
-
+import com.team1678.frc2021.loops.ILooper;
+import com.team1678.frc2021.loops.Loop;
 import edu.wpi.first.wpilibj.Timer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Brings all da colors to da club

@@ -1,12 +1,12 @@
 package com.team1678.frc2021.subsystems;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import com.team1678.frc2021.loops.ILooper;
 import com.team1678.frc2021.loops.Loop;
 import com.team1678.frc2021.loops.Looper;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Used to reset, start, stop, and update all subsystems at once

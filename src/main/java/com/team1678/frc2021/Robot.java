@@ -4,15 +4,12 @@
 package com.team1678.frc2021;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.team1678.frc2021.controlboard.ControlBoard;
 import com.team1678.frc2021.loops.Looper;
 import com.team1678.frc2021.subsystems.*;
 import com.team1678.frc2021.subsystems.superstructure.Superstructure;
-import com.team1678.frc2021.controlboard.ControlBoard;
-
-import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.util.CrashTracker;
 import com.team2910.lib.math.RigidTransform2;
-
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

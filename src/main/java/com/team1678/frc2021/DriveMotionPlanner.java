@@ -1,24 +1,19 @@
 package com.team1678.frc2021;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Pose2dWithCurvature;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
-import com.team254.lib.trajectory.DistanceView;
-import com.team254.lib.trajectory.Trajectory;
-import com.team254.lib.trajectory.TrajectoryIterator;
-import com.team254.lib.trajectory.TrajectorySamplePoint;
-import com.team254.lib.trajectory.TrajectoryUtil;
+import com.team254.lib.trajectory.*;
 import com.team254.lib.trajectory.timing.TimedState;
 import com.team254.lib.trajectory.timing.TimingConstraint;
 import com.team254.lib.trajectory.timing.TimingUtil;
 import com.team254.lib.util.CSVWritable;
 import com.team254.lib.util.Util;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DriveMotionPlanner implements CSVWritable {
     private static final double kMaxDx = 2.0;

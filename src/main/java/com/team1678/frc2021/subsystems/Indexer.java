@@ -1,19 +1,17 @@
 package com.team1678.frc2021.subsystems;
 
-import java.nio.channels.ReadPendingException;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.team1678.frc2021.Constants;
-
 import com.team1678.frc2021.loops.ILooper;
 import com.team1678.frc2021.loops.Loop;
 import com.team254.lib.drivers.TalonFXFactory;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.nio.channels.ReadPendingException;
 
 public class Indexer extends Subsystem {
 
