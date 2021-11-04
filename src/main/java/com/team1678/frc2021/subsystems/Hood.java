@@ -14,11 +14,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
 
 public class Hood extends ServoMotorSubsystem {
-    private AnalogEncoder mEncoder;
+    protected static AnalogEncoder mEncoder;
     private static Hood mInstance;
     private boolean mHoming = true;
 
-    public synchronized static Hood getInstance() {
+    public static synchronized Hood getInstance() {
         if (mInstance == null) {
             mInstance = new Hood(Constants.kHoodConstants);
         }
@@ -97,11 +97,9 @@ public class Hood extends ServoMotorSubsystem {
         return BaseTalonChecker.checkMotors(this, new ArrayList<MotorChecker.MotorConfig<BaseTalon>>() {
             private static final long serialVersionUID = -716113039054569446L;
 
-            {
-                add(new MotorChecker.MotorConfig<>("master", mMaster));
-            }
+            { add(new MotorChecker.MotorConfig<>("master", mMaster)); }
         }, new MotorChecker.CheckerConfig() {
-            {
+             {
                 mRunOutputPercentage = 0.5;
                 mRunTimeSec = 1.0;
                 mCurrentFloor = 0.1;

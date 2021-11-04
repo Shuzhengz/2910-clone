@@ -13,7 +13,6 @@ import com.team254.lib.motion.MotionState;
 import com.team254.lib.motion.SetpointGenerator;
 import com.team254.lib.motion.SetpointGenerator.Setpoint;
 import com.team254.lib.util.Util;
-import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,8 +21,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * Abstract base class for a subsystem with a single sensored servo-mechanism.
  */
 public abstract class ServoMotorSubsystem extends Subsystem {
-    private AnalogEncoder mEncoder;
-
     private static final int kMotionProfileSlot = 0;
     private static final int kPositionPIDSlot = 1;
 
@@ -85,8 +82,10 @@ public abstract class ServoMotorSubsystem extends Subsystem {
     protected final int mForwardSoftLimitTicks;
     protected final int mReverseSoftLimitTicks;
 
-    public StatorCurrentLimitConfiguration STATOR_CURRENT_LIMIT = new StatorCurrentLimitConfiguration(true, 300, 700, 1);
-    public SupplyCurrentLimitConfiguration SUPPLY_CURRENT_LIMIT = new SupplyCurrentLimitConfiguration(false, 40, 100, 1);
+    public StatorCurrentLimitConfiguration STATOR_CURRENT_LIMIT = new StatorCurrentLimitConfiguration
+            (true, 300, 700, 1);
+    public SupplyCurrentLimitConfiguration SUPPLY_CURRENT_LIMIT = new SupplyCurrentLimitConfiguration
+            (false, 40, 100, 1);
 
     protected ServoMotorSubsystem(final ServoMotorSubsystemConstants constants) {
         mConstants = constants;
@@ -94,7 +93,6 @@ public abstract class ServoMotorSubsystem extends Subsystem {
         mSlaves = new TalonFX[mConstants.kSlaveConstants.length];
         mMaster.configStatorCurrentLimit(STATOR_CURRENT_LIMIT);
         mMaster.configSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT);
-        mEncoder = new AnalogEncoder(Constants.kHoodConstants.kAbsoluteEncoderID);
 
         TalonUtil.checkError(mMaster.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0,
                 Constants.kLongCANTimeoutMs), mConstants.kName + ": Could not detect encoder: ");
@@ -258,8 +256,8 @@ public abstract class ServoMotorSubsystem extends Subsystem {
 
     public synchronized void setNeutralMode(NeutralMode mode) {
         mMaster.setNeutralMode(mode);
-        for (int i = 0; i < mSlaves.length; ++i) {
-            mSlaves[i].setNeutralMode(mode);
+        for (TalonFX mSlave : mSlaves) {
+            mSlave.setNeutralMode(mode);
         }
     }
 
@@ -410,11 +408,8 @@ public abstract class ServoMotorSubsystem extends Subsystem {
     }
 
     public synchronized boolean hasFinishedTrajectory() {
-        if (Util.epsilonEquals(mPeriodicIO.active_trajectory_position, ticksToUnits(getSetpoint()),
-                Math.max(1, mConstants.kDeadband))) {
-            return true;
-        }
-        return false;
+        return Util.epsilonEquals(mPeriodicIO.active_trajectory_position, ticksToUnits(getSetpoint()),
+                Math.max(1, mConstants.kDeadband));
     }
 
     public synchronized double getSetpoint() {
@@ -518,7 +513,7 @@ public abstract class ServoMotorSubsystem extends Subsystem {
     }
 
     public boolean atHomingLocation() {
-        return mEncoder.getPositionOffset() == mConstants.kAbsoluteEncoderZeroReading;
+        return Hood.mEncoder.getPositionOffset() == mConstants.kAbsoluteEncoderZeroReading;
     }
 
     public synchronized void resetIfAtLimit() {

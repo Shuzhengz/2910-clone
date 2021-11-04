@@ -76,7 +76,7 @@ public class Shooter extends Subsystem {
         }
         return false;
     }
-    public synchronized static Shooter mInstance() {
+    public static synchronized Shooter mInstance() {
         if (mInstance == null) {
             mInstance = new Shooter();
         }

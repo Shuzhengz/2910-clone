@@ -60,7 +60,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     /* Driver Buttons */
-    zeroGyro.whenPressed(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    zeroGyro.whenPressed(new InstantCommand(s_Swerve::zeroGyro));
     // Snap Commands
     yButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(0)));
     bButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(90)));
