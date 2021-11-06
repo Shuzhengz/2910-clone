@@ -75,9 +75,9 @@ public class Constants {
 
 	 public static final int kIndexerId = 15;
 
-	 public static final double kZoomingSpeed = 0.8;
-	 public static final double kIndexingSpeed = 0.5;
-	 public static final double kBarfingSpeed = -0.9;
+	 public static final double kZoomingVoltage = 6.0;
+	 public static final double kIndexingVoltage = 4.0;
+	 public static final double kBarfingVoltage = -6.0;
 
 	// shooter
 	public static final int kMasterFlywheelID = 2;

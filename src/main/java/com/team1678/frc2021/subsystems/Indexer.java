@@ -94,10 +94,10 @@ public class Indexer extends Subsystem {
 
     /**
      * Spins the motor, in the percentage output control mode
-     * @param speed the speed you want to spin it at
+     * @param voltage the voltage you want to spin it at, in percent output mode
      */
-    private void spinMotor(double speed) {
-        mPeriodicIO.indexer_demand = speed;
+    private void spinMotor(double voltage) {
+        mPeriodicIO.indexer_demand = voltage / 12;
     }
 
     /**
@@ -244,12 +244,12 @@ public class Indexer extends Subsystem {
                 mIntakeReverse = false;
                 mIntakeCanPass = false;
                 if (slotsEmpty()) {
-                    spinMotor(Constants.kIndexingSpeed);
+                    spinMotor(Constants.kIndexingVoltage);
                 } else if (!slotsFilled() && mIntakeHasBall) {
-                    spinMotor(Constants.kZoomingSpeed);
+                    spinMotor(Constants.kZoomingVoltage);
                 } else {
                     boolean atIntake = false;
-                    spinMotor(-Constants.kIndexingSpeed);
+                    spinMotor(-Constants.kIndexingVoltage);
                     while (!atIntake) {
                         atIntake = mLowerBeamBreak.get();
                     }
@@ -261,11 +261,11 @@ public class Indexer extends Subsystem {
                 mShooterNeedShoot = false;
                 mIntakeReverse = false;
                 if (slotsEmpty()) {
-                    spinMotor(Constants.kZoomingSpeed);
+                    spinMotor(Constants.kZoomingVoltage);
                     mShooterNeedShoot = true;
                     mIntakeCanPass = true;
                 } else if (slotsEmpty() && mIntakeHasBall) {
-                    spinMotor(Constants.kZoomingSpeed);
+                    spinMotor(Constants.kZoomingVoltage);
                     try { Thread.sleep(100); }
                     catch (InterruptedException ex) { Thread.currentThread().interrupt(); }
                     mShooterNeedShoot = true;
@@ -273,11 +273,11 @@ public class Indexer extends Subsystem {
                 } else {
                     mShooterNeedShoot = true;
                     mIntakeCanPass = true;
-                    spinMotor(Constants.kZoomingSpeed);
+                    spinMotor(Constants.kZoomingVoltage);
                 }
                 break;
             case BARFING:
-                spinMotor(Constants.kBarfingSpeed);
+                spinMotor(Constants.kBarfingVoltage);
                 mIntakeReverse = true;
                 mShooterNeedShoot = false;
                 break;
@@ -289,14 +289,14 @@ public class Indexer extends Subsystem {
                 if (mBallCount == 3) {
                     System.out.println("Indexer full");
                 } else if (mBallCount < 3 && mBallCount > 0) {
-                    spinMotor(Constants.kIndexingSpeed);
+                    spinMotor(Constants.kIndexingVoltage);
                 }
                 break;
             case PASSING_THROUGH:
                 mIntakeReverse = false;
                 mIntakeCanPass = true;
                 mShooterNeedShoot = true;
-                spinMotor(Constants.kIndexingSpeed);
+                spinMotor(Constants.kZoomingVoltage);
         }
     }
 
