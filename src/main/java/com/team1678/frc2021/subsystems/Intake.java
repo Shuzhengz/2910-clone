@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake extends Subsystem {
 
-    private static double kIntakingVoltage = 9.0;
+    private static double kIntakingVoltage = 3.5;
     private static double kIdleVoltage = 0;
     private static double mCurrent;
 
