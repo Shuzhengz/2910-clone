@@ -97,7 +97,7 @@ public class Indexer extends Subsystem {
      * @param voltage the voltage you want to spin it at, in percent output mode
      */
     private void spinMotor(double voltage) {
-        mPeriodicIO.indexer_demand = voltage / 12;
+        mPeriodicIO.indexer_demand = voltage;
     }
 
     /**
