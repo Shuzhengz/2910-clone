@@ -33,7 +33,7 @@ public class Indexer extends Subsystem {
 
     private boolean mIntakeHasBall;
     private boolean mIntakeCanPass = false;
-    private boolean mIntakeReverse =  false;
+    private boolean mIntakeReverse = false;
     private boolean mShooterNeedShoot = false;
 
     private State mState = State.IDLE;
@@ -78,6 +78,7 @@ public class Indexer extends Subsystem {
 
     /**
      * Returns the Indexer velocity
+     *
      * @return Indexer velocity
      */
     public double getIndexerDemand() {
@@ -94,6 +95,7 @@ public class Indexer extends Subsystem {
 
     /**
      * Spins the motor, in the percentage output control mode
+     *
      * @param voltage the voltage you want to spin it at, in percent output mode
      */
     private void spinMotor(double voltage) {
@@ -102,6 +104,7 @@ public class Indexer extends Subsystem {
 
     /**
      * Checks if the slots are filled
+     *
      * @return Are the slots filled
      */
     public synchronized boolean slotsFilled() {
@@ -110,10 +113,11 @@ public class Indexer extends Subsystem {
 
     /**
      * Checks if the indexer should Index
+     *
      * @return if it should index
      */
     public boolean shouldIndex() {
-        if(slotsFilled()){
+        if (slotsFilled()) {
             return false;
         }
         return isBallAtIntake();
@@ -121,6 +125,7 @@ public class Indexer extends Subsystem {
 
     /**
      * Checks if the slots are empty
+     *
      * @return Are the slots empty
      */
     public synchronized boolean slotsEmpty() {
@@ -129,6 +134,7 @@ public class Indexer extends Subsystem {
 
     /**
      * Gets the instant of the Indexer
+     *
      * @return Indexer Instance
      */
     public static synchronized Indexer getInstance() {
@@ -144,11 +150,14 @@ public class Indexer extends Subsystem {
     private void updateSlots() {
         mIntakeHasBall = mPeriodicIO.beamBreakSensor[0];
         mSlotsClean = mPeriodicIO.beamBreakSensor[1];
-        if (mBallCount != 0) { mSlotsClean = false; }
+        if (mBallCount != 0) {
+            mSlotsClean = false;
+        }
     }
 
     /**
      * Checks if the lower beambreak sensor has a ball
+     *
      * @return ic the lower beambreak has a ball
      */
     private boolean isBallAtIntake() {
@@ -157,6 +166,7 @@ public class Indexer extends Subsystem {
 
     /**
      * Sets the percentage for the open loop, percent output mode for the indexer
+     *
      * @param percentage The Percentage to set the open loop at
      */
     public synchronized void setOpenLoop(double percentage) {
@@ -187,6 +197,7 @@ public class Indexer extends Subsystem {
 
     /**
      * Checks the system
+     *
      * @return true
      */
     @Override
@@ -204,6 +215,7 @@ public class Indexer extends Subsystem {
 
     /**
      * Registers the enabled loops
+     *
      * @param enabledLooper the enabled ILooper
      */
     @Override
@@ -266,8 +278,11 @@ public class Indexer extends Subsystem {
                     mIntakeCanPass = true;
                 } else if (slotsEmpty() && mIntakeHasBall) {
                     spinMotor(Constants.kZoomingVoltage);
-                    try { Thread.sleep(100); }
-                    catch (InterruptedException ex) { Thread.currentThread().interrupt(); }
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
                     mShooterNeedShoot = true;
                     mIntakeCanPass = true;
                 } else {
@@ -355,7 +370,7 @@ public class Indexer extends Subsystem {
     public static class PeriodicIO {
         // INPUTS
         public double timestamp;
-        private boolean[] beamBreakSensor = { false, false };
+        private boolean[] beamBreakSensor = {false, false};
 
         public double indexer_velocity;
         public double indexer_current;

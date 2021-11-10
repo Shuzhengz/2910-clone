@@ -18,6 +18,7 @@ public class AimingParameters {
                             RigidTransform2 field_to_goal,
                             Rotation2 field_to_vision_target_normal, double last_seen_timestamp,
                             double stability, int track_id) {
+
         this.turret_to_goal = turret_to_goal;
         this.field_to_vision_target_normal = field_to_vision_target_normal;
         this.field_to_goal = field_to_goal;

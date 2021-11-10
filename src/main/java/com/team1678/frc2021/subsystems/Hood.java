@@ -97,9 +97,11 @@ public class Hood extends ServoMotorSubsystem {
         return BaseTalonChecker.checkMotors(this, new ArrayList<MotorChecker.MotorConfig<BaseTalon>>() {
             private static final long serialVersionUID = -716113039054569446L;
 
-            { add(new MotorChecker.MotorConfig<>("master", mMaster)); }
+            {
+                add(new MotorChecker.MotorConfig<>("master", mMaster));
+            }
         }, new MotorChecker.CheckerConfig() {
-             {
+            {
                 mRunOutputPercentage = 0.5;
                 mRunTimeSec = 1.0;
                 mCurrentFloor = 0.1;

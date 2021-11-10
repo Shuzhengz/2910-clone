@@ -19,67 +19,68 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  /* Controllers */
-  private final XboxController driver = new XboxController(0);
+    /* Controllers */
+    private final XboxController driver = new XboxController(0);
 
-  /* Drive Controls */
-  private final int translationAxis = XboxController.Axis.kLeftY.value;
-  private final int strafeAxis = XboxController.Axis.kLeftX.value;
-  private final int rotationAxis = XboxController.Axis.kRightX.value;
+    /* Drive Controls */
+    private final int translationAxis = XboxController.Axis.kLeftY.value;
+    private final int strafeAxis = XboxController.Axis.kLeftX.value;
+    private final int rotationAxis = XboxController.Axis.kRightX.value;
 
-  /* Driver Buttons */
-  private final Button zeroGyro = new JoystickButton(driver, XboxController.Button.kStart.value);
-  private final Button yButton = new JoystickButton(driver, XboxController.Button.kY.value);
-  private final Button bButton = new JoystickButton(driver, XboxController.Button.kB.value);
-  private final Button aButton = new JoystickButton(driver, XboxController.Button.kA.value);
-  private final Button xButton = new JoystickButton(driver, XboxController.Button.kX.value);
-
-  /* Subsystems */
-  private final Swerve s_Swerve = new Swerve();
-
-  /* Autonomous Selector */
-  //private final AutonomousSelector autonomousSelector;
-
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    boolean fieldRelative = true;
-    boolean openLoop = true;
-    // We're not going to worry about Teleop right now.
-    s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
-    //autonomousSelector = new AutonomousSelector();
-
-    // Configure the button bindings
-    configureButtonBindings();
-  }
-
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-  private void configureButtonBindings() {
     /* Driver Buttons */
-    zeroGyro.whenPressed(new InstantCommand(s_Swerve::zeroGyro));
-    // Snap Commands
-    yButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(0)));
-    bButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(90)));
-    aButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(180)));
-    xButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(270)));    
-  }
+    private final Button zeroGyro = new JoystickButton(driver, XboxController.Button.kStart.value);
+    private final Button yButton = new JoystickButton(driver, XboxController.Button.kY.value);
+    private final Button bButton = new JoystickButton(driver, XboxController.Button.kB.value);
+    private final Button aButton = new JoystickButton(driver, XboxController.Button.kA.value);
+    private final Button xButton = new JoystickButton(driver, XboxController.Button.kX.value);
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
+    /* Subsystems */
+    private final Swerve s_Swerve = new Swerve();
+
+    /* Autonomous Selector */
+    //private final AutonomousSelector autonomousSelector;
+
+    /**
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
+    public RobotContainer() {
+        boolean fieldRelative = true;
+        boolean openLoop = true;
+        // We're not going to worry about Teleop right now.
+        s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
+        //autonomousSelector = new AutonomousSelector();
+
+        // Configure the button bindings
+        configureButtonBindings();
+    }
+
+    /**
+     * Use this method to define your button->command mappings. Buttons can be created by
+     * instantiating a {@link GenericHID} or one of its subclasses ({@link
+     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+     * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     */
+    private void configureButtonBindings() {
+        /* Driver Buttons */
+        zeroGyro.whenPressed(new InstantCommand(s_Swerve::zeroGyro));
+        // Snap Commands
+        yButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(0)));
+        bButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(90)));
+        aButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(180)));
+        xButton.whenPressed(new InstantCommand(() -> s_Swerve.startSnap(270)));
+    }
+
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
   /*public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     return autonomousSelector.getCommand(s_Swerve);
   }*/
+    public Swerve getDrivetrainSubsystem() {
+        return Swerve.getInstance();
+    }
 
-  public Swerve getDrivetrainSubsystem() {
-    return Swerve.getInstance();
-  }
-  
 }

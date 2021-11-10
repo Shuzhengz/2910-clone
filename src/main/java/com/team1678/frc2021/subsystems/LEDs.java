@@ -21,10 +21,11 @@ import java.util.List;
 /**
  * Brings all da colors to da club
  */
-public class LEDs extends Subsystem{
+public class LEDs extends Subsystem {
     private static LEDs instance = null;
-    public static LEDs getInstance(){
-        if(instance == null)
+
+    public static LEDs getInstance() {
+        if (instance == null)
             instance = new LEDs();
         return instance;
     }
@@ -35,7 +36,7 @@ public class LEDs extends Subsystem{
      * LED Utility class
      * creates new instances
      */
-    public LEDs(){
+    public LEDs() {
         canifier = Canifier.getInstance().getCanifier();
     }
 
@@ -47,7 +48,7 @@ public class LEDs extends Subsystem{
     /**
      * The states of the LED and the RGB values
      */
-    public enum State{
+    public enum State {
         OFF(0.0, 0.0, 0.0, Double.POSITIVE_INFINITY, 0.0, false),
         DISABLED(255.0, 20.0, 30.0, Double.POSITIVE_INFINITY, 0.0, false),
         ENABLED(0.0, 0.0, 255.0, Double.POSITIVE_INFINITY, 0.0, false),
@@ -80,14 +81,15 @@ public class LEDs extends Subsystem{
 
         /**
          * The states
-         * @param r red
-         * @param g green
-         * @param b blue
-         * @param onTime the time that it is on
-         * @param offTime the time that it is off
+         *
+         * @param r             red
+         * @param g             green
+         * @param b             blue
+         * @param onTime        the time that it is on
+         * @param offTime       the time that it is off
          * @param isCycleColors if it is currently cycling colors
          */
-        private State(double r, double g, double b, double onTime, double offTime, boolean isCycleColors){
+        private State(double r, double g, double b, double onTime, double offTime, boolean isCycleColors) {
             red = r / 255.0;
             green = g / 255.0;
             blue = b / 255.0;
@@ -97,7 +99,8 @@ public class LEDs extends Subsystem{
 
         /**
          * The states
-         * @param hue the hue of the light in float
+         *
+         * @param hue   the hue of the light in float
          * @param cycle cycle or not
          */
         private State(float hue, boolean cycle) {
@@ -107,9 +110,10 @@ public class LEDs extends Subsystem{
 
         /**
          * The states
-         * @param hue the hue of the light in float
+         *
+         * @param hue       the hue of the light in float
          * @param transTime the transition time for the colors
-         * @param cycle cycle or not
+         * @param cycle     cycle or not
          */
         private State(float hue, double transTime, boolean cycle) {
             this.startingHue = hue;
@@ -119,9 +123,10 @@ public class LEDs extends Subsystem{
 
         /**
          * The states
-         * @param colors the colors in a list of lists
-         * @param cycleTime the cycle time of the lights
-         * @param isCycleColors is currently cycling color or not
+         *
+         * @param colors         the colors in a list of lists
+         * @param cycleTime      the cycle time of the lights
+         * @param isCycleColors  is currently cycling color or not
          * @param transitionTime the transition time for the color
          */
         private State(List<List<Double>> colors, double cycleTime, boolean isCycleColors, double transitionTime) {
@@ -137,18 +142,20 @@ public class LEDs extends Subsystem{
 
     /**
      * Gets the current state
+     *
      * @return current state
      */
-    public State getState(){
+    public State getState() {
         return currentState;
     }
 
     /**
      * Set the state
+     *
      * @param newState pass in a new state
      */
-    private void setState(State newState){
-        if(newState != currentState){
+    private void setState(State newState) {
+        if (newState != currentState) {
             currentState = newState;
             lastOffTime = 0.0;
             lastOnTime = 0.0;
@@ -157,7 +164,7 @@ public class LEDs extends Subsystem{
     }
 
     // Creates new loop
-    private final Loop loop = new Loop(){
+    private final Loop loop = new Loop() {
 
         @Override
         public void onStart(double timestamp) {
@@ -178,11 +185,12 @@ public class LEDs extends Subsystem{
 
     /**
      * Sets the LED for the canifiers
+     *
      * @param r red
      * @param g green
      * @param b blue
      */
-    public void setLEDs(double r, double g, double b){
+    public void setLEDs(double r, double g, double b) {
         //A: Green
         //B: Red
         //C: Blue
@@ -193,9 +201,10 @@ public class LEDs extends Subsystem{
 
     /**
      * Sets the state to new state
+     *
      * @param state the state to set state to
      */
-    public void conformToState(State state){
+    public void conformToState(State state) {
         setState(state);
     }
 
@@ -209,7 +218,7 @@ public class LEDs extends Subsystem{
      * Writes to the periodic output
      */
     @Override
-    public void writePeriodicOutputs(){
+    public void writePeriodicOutputs() {
         double timestamp = Timer.getFPGATimestamp();
         if (currentState == State.RAINBOW && currentState.isCycleColors) {
             stateHue += 2;
@@ -271,12 +280,12 @@ public class LEDs extends Subsystem{
 
             setLEDs(rgb[0], rgb[1], rgb[2]);
 
-        } else if(!lit && (timestamp - lastOffTime) >= currentState.offTime && !currentState.isCycleColors){
+        } else if (!lit && (timestamp - lastOffTime) >= currentState.offTime && !currentState.isCycleColors) {
             setLEDs(currentState.red, currentState.green, currentState.blue);
             lastOnTime = timestamp;
             lit = true;
-        } else if(lit && !Double.isInfinite(currentState.onTime) && !currentState.isCycleColors){
-            if((timestamp - lastOnTime) >= currentState.onTime){
+        } else if (lit && !Double.isInfinite(currentState.onTime) && !currentState.isCycleColors) {
+            if ((timestamp - lastOnTime) >= currentState.onTime) {
                 setLEDs(0.0, 0.0, 0.0);
                 lastOffTime = timestamp;
                 lit = false;
@@ -295,15 +304,17 @@ public class LEDs extends Subsystem{
 
     /**
      * Registers the enabled ILoopers
+     *
      * @param enabledLooper the looper that is enabled
      */
     @Override
-    public void registerEnabledLoops(ILooper enabledLooper){
+    public void registerEnabledLoops(ILooper enabledLooper) {
         enabledLooper.register(loop);
     }
 
     /**
      * Checks the system
+     *
      * @return ture
      */
     @Override

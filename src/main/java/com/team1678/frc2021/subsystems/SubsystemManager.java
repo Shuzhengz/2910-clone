@@ -55,9 +55,9 @@ public class SubsystemManager implements ILooper {
     }
 
 
-    public boolean haveEmergency(){
+    public boolean haveEmergency() {
         boolean emergency = false;
-        for(Subsystem s : mAllSubsystems){
+        for (Subsystem s : mAllSubsystems) {
             emergency |= s.hasEmergency;
         }
         return emergency;
@@ -75,7 +75,7 @@ public class SubsystemManager implements ILooper {
         @Override
         public void onLoop(double timestamp) {
             for (Subsystem s : mAllSubsystems) {
-               s.readPeriodicInputs();
+                s.readPeriodicInputs();
             }
             for (Loop l : mLoops) {
                 l.onLoop(timestamp);

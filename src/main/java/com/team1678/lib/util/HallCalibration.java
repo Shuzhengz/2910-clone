@@ -30,6 +30,7 @@ public class HallCalibration {
 
     /**
      * The hall calibration instance class
+     *
      * @param resetPosition the hall effect sensor's reset position
      */
     public HallCalibration(double resetPosition) {
@@ -87,6 +88,7 @@ public class HallCalibration {
 
     /**
      * Checks if the hall effect is calibrated
+     *
      * @return if it is calibrated
      */
     public boolean isCalibrated() {
@@ -95,6 +97,7 @@ public class HallCalibration {
 
     /**
      * Gets the hall offset
+     *
      * @return the current offset
      */
     public double getOffset() {

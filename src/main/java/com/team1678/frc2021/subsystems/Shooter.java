@@ -76,6 +76,7 @@ public class Shooter extends Subsystem {
         }
         return false;
     }
+
     public static synchronized Shooter mInstance() {
         if (mInstance == null) {
             mInstance = new Shooter();
@@ -99,9 +100,11 @@ public class Shooter extends Subsystem {
             public void onStart(double timestamp) {
                 //startLogging();
             }
+
             @Override
             public void onLoop(double timestamp) {
             }
+
             @Override
             public void onStop(double timestamp) {
                 //stopLogging();

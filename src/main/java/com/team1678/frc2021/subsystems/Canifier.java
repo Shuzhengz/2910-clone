@@ -22,6 +22,7 @@ public class Canifier extends Subsystem {
 
     /**
      * Gets and instance of the canifier if there are no existing instances
+     *
      * @return a new canifier instance
      */
     public static synchronized Canifier getInstance() {
@@ -33,6 +34,7 @@ public class Canifier extends Subsystem {
 
     /**
      * Gets the canifier device ID
+     *
      * @return the device ID as an integer
      */
     public int getDeviceId() {
@@ -52,6 +54,7 @@ public class Canifier extends Subsystem {
     /**
      * Gets the canifier itself as a CANifier
      * The CANifier is the canifier object provided by CTRE
+     *
      * @return the canifier
      */
     public synchronized CANifier getCanifier() {
@@ -60,6 +63,7 @@ public class Canifier extends Subsystem {
 
     /**
      * Check system
+     *
      * @return false
      */
     @Override

@@ -60,7 +60,7 @@ public class Limelight extends Subsystem {
         Loop mLoop = new Loop() {
             @Override
             public void onStart(double timestamp) {
-              //  RobotState.getInstance().resetVision();
+                //  RobotState.getInstance().resetVision();
             }
 
             @Override
@@ -71,7 +71,7 @@ public class Limelight extends Subsystem {
                     //         && mPeriodicIO.has_comms && !Superstructure.getInstance().getDisableLimelight()) {
                     //     RobotState.getInstance().addVisionUpdate(timestamp - getLatency(), getTarget());
                     // } else {
-                        RobotState.getInstance().addVisionUpdate(timestamp - getLatency(), null);
+                    RobotState.getInstance().addVisionUpdate(timestamp - getLatency(), null);
                     // }
                     //startLogging();
                 }
@@ -108,11 +108,11 @@ public class Limelight extends Subsystem {
         public int stream = 2; // sets stream layout if another webcam is attached
         public int snapshot = 0; // 0 - stop snapshots, 1 - 2 Hz
     }
-    
+
     private LimelightConstants mConstants = null;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private boolean mOutputsHaveChanged = true;
-    private double[] mZeroArray = new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    private double[] mZeroArray = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private List<TargetInfo> mTargets = new ArrayList<>();
     private boolean mSeesTarget = false;
 
@@ -215,7 +215,7 @@ public class Limelight extends Subsystem {
 
     public synchronized void setPipeline(int mode) {
         if (mode != mPeriodicIO.pipeline) {
-         //   RobotState.getInstance().resetVision();
+            //   RobotState.getInstance().resetVision();
             mPeriodicIO.pipeline = mode;
 
             System.out.println(mPeriodicIO.pipeline + ", " + mode);
@@ -237,7 +237,7 @@ public class Limelight extends Subsystem {
 
     /**
      * @return two targets that make up one hatch/port or null if less than two
-     *         targets are found
+     * targets are found
      */
     public synchronized List<TargetInfo> getTarget() {
         List<TargetInfo> targets = new ArrayList<TargetInfo>(); //getRawTargetInfos();
@@ -351,8 +351,8 @@ public class Limelight extends Subsystem {
         Translation2d leftCorner = leftTop.get(0);
         Translation2d rightCorner = rightTop.get(1);
 
-        return List.of(new double[] { leftCorner.x(), leftCorner.y() },
-                new double[] { rightCorner.x(), rightCorner.y() });
+        return List.of(new double[]{leftCorner.x(), leftCorner.y()},
+                new double[]{rightCorner.x(), rightCorner.y()});
     }
 
     public double getLatency() {
