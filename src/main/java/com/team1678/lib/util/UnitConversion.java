@@ -4,6 +4,11 @@ package com.team1678.lib.util;
  * Converts values of a unit to another unit
  */
 public class UnitConversion {
+
+    private UnitConversion() {
+        // Private Unit Conversion method
+    }
+
     public static double feet_to_meters(double feet) {
         return inches_to_meters(feet * 12.0);
     }

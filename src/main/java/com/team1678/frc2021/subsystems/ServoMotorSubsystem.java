@@ -351,7 +351,8 @@ public abstract class ServoMotorSubsystem extends Subsystem {
         }
     }
 
-    public synchronized void handleMasterReset(boolean reset) {}
+    public synchronized void handleMasterReset(boolean reset) {
+    }
 
     @Override
     public void registerEnabledLoops(ILooper mEnabledLooper) {

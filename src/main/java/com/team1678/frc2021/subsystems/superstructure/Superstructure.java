@@ -84,8 +84,8 @@ public class Superstructure extends Subsystem {
         // The superstructure class
     }
 
-    public synchronized static Superstructure getInstance(){
-        if(mInstance == null)
+    public synchronized static Superstructure getInstance() {
+        if (mInstance == null)
             mInstance = new Superstructure();
         return mInstance;
     }
@@ -106,10 +106,10 @@ public class Superstructure extends Subsystem {
         return mWantsShoot;
     }
 
-    public void disabledState(){
+    public void disabledState() {
     }
 
-    public void neutralState(){
+    public void neutralState() {
     }
 
     public synchronized boolean isAimed() {
@@ -239,6 +239,7 @@ public class Superstructure extends Subsystem {
     /**
      * Gets the turn needed by the drivetrain to aim
      * TODO add this to Swerve so the aiming works
+     *
      * @return how much to turn
      */
     public synchronized double getTurnNeeded() {

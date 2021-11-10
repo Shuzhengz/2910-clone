@@ -142,7 +142,7 @@ public class SwerveDriveModule extends SwerveModule {
      * @param angleEncoder   The analog input for the angle encoder
      */
     public SwerveDriveModule(Vector2 modulePosition, double angleOffset, double angleGearRatio, double driveGearRatio,
-                           TalonFX angleMotor, TalonFX driveMotor, CANCoder angleEncoder) {
+                             TalonFX angleMotor, TalonFX driveMotor, CANCoder angleEncoder) {
         super(modulePosition);
         this.absoluteEncoderAngleOffset = angleOffset;
         this.steeringMotor = angleMotor;
@@ -246,42 +246,42 @@ public class SwerveDriveModule extends SwerveModule {
         }
     }
 
-    public void set10VoltRotationMode(boolean tenVolts){
-		if(tenVolts && !tenVoltRotationMode){
-			steeringMotor.selectProfileSlot(1, 0);
-			steeringMotor.configVoltageCompSaturation(10.0, 10);
-			tenVoltRotationMode = true;
-		}else if(!tenVolts && tenVoltRotationMode){
-			steeringMotor.selectProfileSlot(0, 0);
-			steeringMotor.configVoltageCompSaturation(7.0, 10);
-			tenVoltRotationMode = false;
-		}
-	}
+    public void set10VoltRotationMode(boolean tenVolts) {
+        if (tenVolts && !tenVoltRotationMode) {
+            steeringMotor.selectProfileSlot(1, 0);
+            steeringMotor.configVoltageCompSaturation(10.0, 10);
+            tenVoltRotationMode = true;
+        } else if (!tenVolts && tenVoltRotationMode) {
+            steeringMotor.selectProfileSlot(0, 0);
+            steeringMotor.configVoltageCompSaturation(7.0, 10);
+            tenVoltRotationMode = false;
+        }
+    }
 
-    public TalonFX getDriveMotor(){
+    public TalonFX getDriveMotor() {
         return driveMotor;
     }
 
-    public TalonFX getRotationMotor(){
+    public TalonFX getRotationMotor() {
         return steeringMotor;
     }
 
-	public synchronized void zeroSensors() {
-		zeroSensors(new RigidTransform2());
-		//rotationPID.reset();
+    public synchronized void zeroSensors() {
+        zeroSensors(new RigidTransform2());
+        //rotationPID.reset();
     }
-    
-    public synchronized void resetPose(RigidTransform2 robotPose){
-		Vector2 modulePosition = robotPose.transformBy(RigidTransform2.fromTranslation(startingPosition)).getTranslation();
-		position = modulePosition;
-	}
-	
-	public synchronized void zeroSensors(RigidTransform2 robotPose) {
-		//driveMotor.setSelectedSensorPosition(0, 0, 100); TODO check if this is necessary
-		resetPose(robotPose);
-		estimatedRobotPose = robotPose;
-		// previousEncDistance = getDriveDistanceInches();
-	}
+
+    public synchronized void resetPose(RigidTransform2 robotPose) {
+        Vector2 modulePosition = robotPose.transformBy(RigidTransform2.fromTranslation(startingPosition)).getTranslation();
+        position = modulePosition;
+    }
+
+    public synchronized void zeroSensors(RigidTransform2 robotPose) {
+        //driveMotor.setSelectedSensorPosition(0, 0, 100); TODO check if this is necessary
+        resetPose(robotPose);
+        estimatedRobotPose = robotPose;
+        // previousEncDistance = getDriveDistanceInches();
+    }
 
     private static final class SteeringConfiguration {
         public boolean invertMotor;

@@ -67,7 +67,7 @@ public class RobotState {
      * 3. Turret-to-camera: This is a constant (per camera).
      *
      * 4. Camera-to-goal: Measured by the vision system.
-     * 
+     *
      * 5. Vehicle-to-hood: Measured by bore encoder on hood
      */
 
@@ -93,7 +93,7 @@ public class RobotState {
      * Resets the field to robot transform (robot's position on the field)
      */
     public synchronized void reset(double start_time, RigidTransform2 initial_field_to_vehicle,
-            Rotation2 initial_vehicle_to_turret, Rotation2 initial_vehicle_to_hood) {
+                                   Rotation2 initial_vehicle_to_turret, Rotation2 initial_vehicle_to_hood) {
         reset(start_time, initial_field_to_vehicle);
 
         turret_rotation_ = new InterpolatingTreeMap<>(kObservationBufferSize);
@@ -129,7 +129,7 @@ public class RobotState {
                 turret_rotation_.getInterpolated(new InterpolatingDouble(timestamp)));
     }
 
-    
+
     public synchronized Rotation2 getVehicleToHood(double timestamp) {
         return vehicle_to_hood_.getInterpolated(new InterpolatingDouble(timestamp));
     }
@@ -170,7 +170,7 @@ public class RobotState {
     }
 
     public synchronized void addObservations(double timestamp, Twist2d displacement, Twist2d measured_velocity,
-            Twist2d predicted_velocity) {
+                                             Twist2d predicted_velocity) {
         distance_driven_ += displacement.dx;
         //addFieldToVehicleObservation(timestamp,
         //        Kinematics.integrateForwardKinematics(getLatestFieldToVehicle().getValue(), displacement));
@@ -208,7 +208,7 @@ public class RobotState {
     public synchronized void resetVision() {
         vision_target_.reset();
     }
-    
+
 
     private Vector2 getCameraToVisionTargetPose(double timestamp, TargetInfo target, Limelight source) {
         // Compensate for camera pitch
@@ -234,11 +234,11 @@ public class RobotState {
     }
 
     private void updateGoalTracker(double timestamp, List<Vector2> cameraToVisionTargetPoses, GoalTracker tracker,
-            Limelight source) {
+                                   Limelight source) {
         if (cameraToVisionTargetPoses.size() != 1
                 || cameraToVisionTargetPoses.get(0) == null /*
-                                                             * || cameraToVisionTargetPoses.get(1) == null
-                                                             */)
+         * || cameraToVisionTargetPoses.get(1) == null
+         */)
             return;
         RigidTransform2 cameraToVisionTarget = RigidTransform2.fromTranslation(cameraToVisionTargetPoses.get(0));
 
@@ -267,7 +267,7 @@ public class RobotState {
     // use known field target orientations to compensate for inaccuracy, assumes
     // robot starts pointing directly away
     // from and perpendicular to alliance wall
-    private final double[] kPossibleTargetNormals = { 0.0, 90.0, 180.0, 270.0 };
+    private final double[] kPossibleTargetNormals = {0.0, 90.0, 180.0, 270.0};
 
     public synchronized RigidTransform2 getFieldToVisionTarget() {
         GoalTracker tracker = vision_target_;
@@ -300,7 +300,7 @@ public class RobotState {
     }
 
     public synchronized Optional<AimingParameters> getAimingParameters(boolean inner_goal, int prev_track_id,
-            double max_track_age) {
+                                                                       double max_track_age) {
         GoalTracker tracker = vision_target_;
         List<GoalTracker.TrackReport> reports = tracker.getTracks();
 

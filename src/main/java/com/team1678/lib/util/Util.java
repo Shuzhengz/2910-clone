@@ -31,11 +31,11 @@ public class Util {
         return inRange(v, -maxMagnitude, maxMagnitude);
     }
 
-    public static double normalize(double current, double test){
+    public static double normalize(double current, double test) {
         return Math.max(current, test);
     }
 
-    public static double deadBand(double val, double deadBand){
+    public static double deadBand(double val, double deadBand) {
         return (Math.abs(val) > Math.abs(deadBand)) ? val : 0.0;
     }
 }

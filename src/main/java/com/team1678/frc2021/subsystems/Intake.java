@@ -88,34 +88,34 @@ public class Intake extends Subsystem {
 
     public void runStateMachine() {
         switch (mState) {
-        case INTAKING:
-            if (mPeriodicIO.intake_out) {    
-                mPeriodicIO.demand = kIntakingVoltage;
-            } else {
-                mPeriodicIO.demand = 0.0;
-            }
-            mPeriodicIO.deploy = true;
-            break;
-        case RETRACTING:
-            if (mPeriodicIO.intake_out) {    
+            case INTAKING:
+                if (mPeriodicIO.intake_out) {
+                    mPeriodicIO.demand = kIntakingVoltage;
+                } else {
+                    mPeriodicIO.demand = 0.0;
+                }
+                mPeriodicIO.deploy = true;
+                break;
+            case RETRACTING:
+                if (mPeriodicIO.intake_out) {
+                    mPeriodicIO.demand = -kIntakingVoltage;
+                } else {
+                    mPeriodicIO.demand = 0.0;
+                }
+                mPeriodicIO.deploy = true;
+                break;
+            case IDLE:
+                mPeriodicIO.demand = kIdleVoltage;
+                mPeriodicIO.deploy = false;
+                break;
+            case STAYING_OUT:
+                mPeriodicIO.demand = 0;
+                mPeriodicIO.deploy = true;
+                break;
+            case BARFING:
                 mPeriodicIO.demand = -kIntakingVoltage;
-            } else {
-                mPeriodicIO.demand = 0.0;
-            }
-            mPeriodicIO.deploy = true;
-            break;
-        case IDLE:
-            mPeriodicIO.demand = kIdleVoltage;
-            mPeriodicIO.deploy = false;
-            break;
-        case STAYING_OUT:
-            mPeriodicIO.demand = 0;
-            mPeriodicIO.deploy = true;
-            break;
-        case BARFING:
-            mPeriodicIO.demand = -kIntakingVoltage;
-            mPeriodicIO.deploy = true;
-            break;
+                mPeriodicIO.deploy = true;
+                break;
         }
     }
 
@@ -137,21 +137,21 @@ public class Intake extends Subsystem {
 
     public void setState(WantedAction wanted_state) {
         switch (wanted_state) {
-        case NONE:
-            mState = State.IDLE;
-            break;
-        case INTAKE:
-            mState = State.INTAKING;
-            break;
-        case RETRACT:
-            mState = State.RETRACTING;
-            break;
-        case STAY_OUT:
-            mState = State.STAYING_OUT;
-            break;
-        case BARF:
-            mState = State.BARFING;
-            break;
+            case NONE:
+                mState = State.IDLE;
+                break;
+            case INTAKE:
+                mState = State.INTAKING;
+                break;
+            case RETRACT:
+                mState = State.RETRACTING;
+                break;
+            case STAY_OUT:
+                mState = State.STAYING_OUT;
+                break;
+            case BARF:
+                mState = State.BARFING;
+                break;
         }
 
     }

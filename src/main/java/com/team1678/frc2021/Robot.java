@@ -224,7 +224,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
 
-        try{
+        try {
             double timestamp = Timer.getFPGATimestamp();
             double hood_jog = mControlBoard.getJogHood();
 
@@ -262,7 +262,7 @@ public class Robot extends TimedRobot {
             mSuperstructure.setWantAutoAim();
 
             if (mControlBoard.getShoot()) {
-                if (mSuperstructure.isAimed() ||  mSuperstructure.getWantSpit() || mSuperstructure.getLatestAimingParameters().isEmpty()) {
+                if (mSuperstructure.isAimed() || mSuperstructure.getWantSpit() || mSuperstructure.getLatestAimingParameters().isEmpty()) {
                     mSuperstructure.setWantShoot(true);
                 }
             } else if (mControlBoard.getSpinDown()) {

@@ -158,7 +158,7 @@ public class GamepadButtonControlBoard {
         return mController.getTrigger(CustomXboxController.Side.RIGHT);
     }
 
-    public boolean getOuttake(){
+    public boolean getOuttake() {
         return mController.getTrigger(CustomXboxController.Side.LEFT);
     }
 
@@ -211,8 +211,8 @@ public class GamepadButtonControlBoard {
     }
 
     public boolean climbMode() {
-        return mController.getButton(CustomXboxController.Button.LB) && mController.getButton(CustomXboxController.Button.RB)  &&
-                mController.getTrigger(CustomXboxController.Side.LEFT) &&  mController.getTrigger(CustomXboxController.Side.RIGHT);
+        return mController.getButton(CustomXboxController.Button.LB) && mController.getButton(CustomXboxController.Button.RB) &&
+                mController.getTrigger(CustomXboxController.Side.LEFT) && mController.getTrigger(CustomXboxController.Side.RIGHT);
     }
 
     public boolean getArmExtend() {

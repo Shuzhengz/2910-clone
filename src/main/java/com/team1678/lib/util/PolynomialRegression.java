@@ -4,34 +4,34 @@ import Jama.Matrix;
 import Jama.QRDecomposition;
 
 /**
- *  The {@code PolynomialRegression} class performs a polynomial regression
- *  on an set of <em>N</em> data points (<em>y<sub>i</sub></em>, <em>x<sub>i</sub></em>).
- *  That is, it fits a polynomial
- *  <em>y</em> = &beta;<sub>0</sub> +  &beta;<sub>1</sub> <em>x</em> +
- *  &beta;<sub>2</sub> <em>x</em><sup>2</sup> + ... +
- *  &beta;<sub><em>d</em></sub> <em>x</em><sup><em>d</em></sup>
- *  (where <em>y</em> is the response variable, <em>x</em> is the predictor variable,
- *  and the &beta;<sub><em>i</em></sub> are the regression coefficients)
- *  that minimizes the sum of squared residuals of the multiple regression model.
- *  It also computes associated the coefficient of determination <em>R</em><sup>2</sup>.
- *  <p>
- *  This implementation performs a QR-decomposition of the underlying
- *  Vandermonde matrix, so it is neither the fastest nor the most numerically
- *  stable way to perform the polynomial regression.
+ * The {@code PolynomialRegression} class performs a polynomial regression
+ * on an set of <em>N</em> data points (<em>y<sub>i</sub></em>, <em>x<sub>i</sub></em>).
+ * That is, it fits a polynomial
+ * <em>y</em> = &beta;<sub>0</sub> +  &beta;<sub>1</sub> <em>x</em> +
+ * &beta;<sub>2</sub> <em>x</em><sup>2</sup> + ... +
+ * &beta;<sub><em>d</em></sub> <em>x</em><sup><em>d</em></sup>
+ * (where <em>y</em> is the response variable, <em>x</em> is the predictor variable,
+ * and the &beta;<sub><em>i</em></sub> are the regression coefficients)
+ * that minimizes the sum of squared residuals of the multiple regression model.
+ * It also computes associated the coefficient of determination <em>R</em><sup>2</sup>.
+ * <p>
+ * This implementation performs a QR-decomposition of the underlying
+ * Vandermonde matrix, so it is neither the fastest nor the most numerically
+ * stable way to perform the polynomial regression.
+ * <p>
+ * <p>
+ * Compilation:  javac -cp .:jama.jar PolynomialRegression.java
+ * Execution:    java  -cp .:jama.jar PolynomialRegression
+ * Dependencies: jama.jar
+ * <p>
+ * <p>
+ * % java -cp .:jama.jar PolynomialRegression
+ * 0.01 n^3 + -1.64 n^2 + 168.92 n + -2113.73 (R^2 = 0.997)
+ * <p>
+ * Modified by FRC Team 1678 for specific use case
  *
- *
- *  Compilation:  javac -cp .:jama.jar PolynomialRegression.java
- *  Execution:    java  -cp .:jama.jar PolynomialRegression
- *  Dependencies: jama.jar
- *
- *
- *  % java -cp .:jama.jar PolynomialRegression
- *  0.01 n^3 + -1.64 n^2 + 168.92 n + -2113.73 (R^2 = 0.997)
- *
- *  Modified by FRC Team 1678 for specific use case
- *
- *  @author Robert Sedgewick
- *  @author Kevin Wayne
+ * @author Robert Sedgewick
+ * @author Kevin Wayne
  */
 public class PolynomialRegression implements Comparable<PolynomialRegression> {
     private int degree;                 // degree of the polynomial regression
@@ -44,7 +44,7 @@ public class PolynomialRegression implements Comparable<PolynomialRegression> {
      * Performs a polynomial reggression on the data points {@code (y[i], x[i])}.
      * Uses n as the name of the predictor variable.
      *
-     * @param xy the coordinates of the predictor variable and predictor variable
+     * @param xy     the coordinates of the predictor variable and predictor variable
      * @param degree the degree of the polynomial to fit
      * @throws IllegalArgumentException if the lengths of the two arrays are not equal
      */
@@ -61,9 +61,9 @@ public class PolynomialRegression implements Comparable<PolynomialRegression> {
     /**
      * Performs a polynomial reggression on the data points {@code (y[i], x[i])}.
      *
-     * @param x            the values of the predictor variable
-     * @param y            the corresponding values of the response variable
-     * @param degree       the degree of the polynomial to fit
+     * @param x      the values of the predictor variable
+     * @param y      the corresponding values of the response variable
+     * @param degree the degree of the polynomial to fit
      * @throws IllegalArgumentException if the lengths of the two arrays are not equal
      */
     public void solvePolynomialRegression(double[] x, double[] y, int degree) {
